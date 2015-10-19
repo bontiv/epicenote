@@ -110,7 +110,11 @@ function index_create() {
         $stm->bindValue(1, $_POST['user_name']);
         $stm->execute();
         $rst = $stm->fetch();
-        if ($rst[0] == 0) {
+        $securimage = new Securimage();
+        if ($securimage->check($_POST['captcha_code']) == false) {
+            $tpl->assign('error', 'Le captcha est incorrect');
+            $tpl->assign('error_captcha', true);
+        } elseif ($rst[0] == 0) {
 
             if (strlen($_POST['user_pass']) < 4)
                 $tpl->assign('error', 'Mot de passes pas assez long...');

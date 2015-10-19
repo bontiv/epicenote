@@ -72,10 +72,15 @@
       <br/>
     </div>
     <div class="col-lg-4">
-      <div class="btn btn-default btn-disable">
-        Captcha <br/>
-        <!-- Captcha ICI !!! -->
+
+      <!-- Text input-->
+      <div class="input-group{if isset($error_captcha) && $error_captcha} has-error{/if}">
+        <label class="input-group-addon" for="captcha_code">Vérification Captcha</label>
+        <a title="Nouvelle image" href="#" class="btn btn-default btn-sm" onclick="document.getElementById('captcha').src = '{mkurl action="index" page="securimage_show"}&' + Math.random();
+                return false"><img id="captcha" src="{mkurl action="index" page="securimage_show"}" alt="CAPTCHA Image" /></a>
+        <input id="captcha_code" name="captcha_code" placeholder="" class="form-control input-md" required="" type="text">
       </div>
+
       <br/><br/>
       <div>
         <input type="submit" name="Inscription" class="btn btn-success" />
