@@ -89,6 +89,8 @@ function index_logout() {
     global $tpl;
 
     $_SESSION['user'] = false;
+    unset($_SESSION['user']);
+    $_SESSION = array();
     redirect('index');
 }
 
@@ -101,7 +103,7 @@ function index_create() {
     $tpl->assign('error', false);
     $tpl->assign('succes', false);
 
-    if (isset($_POST['user_name'])) {
+    if (isset($_POST['user_name']) && $_POST['user_name'] != '') {
         $pass = md5($_POST['user_name'] . ':' . $_POST['user_pass']);
 
         $stm = $pdo->prepare('SELECT COUNT(*) FROM users WHERE user_name LIKE ?');
@@ -112,8 +114,6 @@ function index_create() {
 
             if (strlen($_POST['user_pass']) < 4)
                 $tpl->assign('error', 'Mot de passes pas assez long...');
-            elseif ($_POST['user_pass'] != $_POST['confirmPassword'])
-                $tpl->assign('error', 'Mot de passes différents...');
             elseif ($_POST['user_pass'] != $_POST['confirmPassword'])
                 $tpl->assign('error', 'Mot de passes différents...');
             elseif (autoInsert('users', 'user_', array(
@@ -127,6 +127,8 @@ function index_create() {
             //Block d'erreur utilisateur existant
             $tpl->assign('error', "Ce nom d'utilisateur est déjà utilisé.");
         }
+    } elseif (isset($_POST['user_name'])) {
+        $tpl->assign('error', "Le nom d'utilisateur ne peut pas être vide.");
     }
 
     $sql = $pdo->prepare('SELECT * FROM user_types');

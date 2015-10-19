@@ -113,7 +113,16 @@ if (!CONSOLE) {
         $page = 'nomod';
     }
 
-    // Etape 3, vérification des droits d'accès
+    //Etape 3, verification XSRF
+    if (isset($_SESSION['urltok']) && (!isset($_GET['_']) || $_GET['_'] != $_SESSION['urltok'])) {
+        modexec('index', 'logout');
+    }
+
+    if (isset($_SESSION['user'], $_SERVER['HTTP_REFERER']) && $_SERVER['REQUEST_METHOD'] == 'POST' && parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) != $_SERVER['HTTP_HOST']) {
+        modexec('index', 'logout');
+    }
+
+    // Etape 4, vérification des droits d'accès
     if (!isset($_SESSION['user']))
         $_SESSION['user'] = false;
     $tpl->assign('_user', $_SESSION['user']);
@@ -129,7 +138,7 @@ if (!CONSOLE) {
     modsecu($action, $page, $_GET);
     needAcl(getAclLevel($action, $page), $action, $page, $_GET);
 
-    // Etape 4 lancement du module
+    // Etape 5 lancement du module
     modexec($action, $page);
     modexec('syscore', 'moderror');
     quit();

@@ -186,6 +186,9 @@ function mkurl($action, $page = 'index', $options = null) {
 
     $url = $urlbase . 'action=' . urlencode($action);
     $url .= '&page=' . urlencode($page);
+    if (isset($_SESSION['urltok'])) {
+        $url .= '&_=' . $_SESSION['urltok'];
+    }
     foreach ($data as $key => $val)
         $url.= '&' . urlencode($key) . '=' . urlencode($val);
 
@@ -575,6 +578,7 @@ function login_user($user, $pass, $otp_code = null) {
             $_SESSION['user'] = $user;
             $_SESSION['user']['role'] = aclFromText($user['user_role']);
             unset($_SESSION['random']);
+            $_SESSION['urltok'] = substr(sha1(uniqid()), 0, 16);
             return true;
         }
     }
