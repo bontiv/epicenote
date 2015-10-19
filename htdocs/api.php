@@ -25,6 +25,8 @@ if ($_SERVER['PATH_INFO'] == '/.well-known/openid-configuration') {
     $page = 'jwks';
 } elseif ($_SERVER['PATH_INFO'] == '/userinfo') {
     $page = 'userinfo';
+} elseif ($_SERVER['PATH_INFO'] == '/register') {
+    $page = 'register';
 } else {
     echo $_SERVER['PATH_INFO'];
     exit;

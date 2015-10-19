@@ -127,7 +127,7 @@
             <td>
               <a class="email-field" href="mailto:{$line.user_email|escape:'url'}">{$line.user_email|escape}</a>
               <script type="text/javascript">
-                  addAddress('{$line.user_email}');
+                  addAddress('{$line.user_email|escape:'javascript'}');
               </script>
             </td>
             <td><a href="https://intra.epitech.eu/user/{$line.user_login|escape:'url'}/">{$line.user_login|escape}</a></td>

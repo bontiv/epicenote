@@ -17,7 +17,7 @@
   <fieldset>
 
     <!-- Form Name -->
-    <legend>Modification de mot de passe de {$account->fu_user}</legend>
+    <legend>Modification de mot de passe de {$account->fu_user|escape}</legend>
 
     <!-- Text input-->
     <div class="form-group">

@@ -19,7 +19,7 @@
       <tbody>
         {foreach from=$allFtp item="account"}
             <tr>
-              <td>{$account.fu_user}</td>
+              <td>{$account.fu_user|escape}</td>
               <td>
                 <div id="{$account.fu_id}-pass" style="display:none;">{$account.fu_pass}</div>
                 <div id="{$account.fu_id}-label">********* <a href="#" onclick="show({$account.fu_id})"><i class="glyphicon glyphicon-user"></i><span class="hide">Voir</span></a></div>

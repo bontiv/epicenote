@@ -24,7 +24,7 @@
         <tr>
           <td><a href="{mkurl action="user" page="view" user=$line.user_id}">{$line.user_name|escape}</a></td>
           <td><span class="label label-primary">Manager</span></td>
-          <td>{$line.user_login}</td>
+          <td>{$line.user_login|escape}</td>
           <td><a href="mailto:{$line.user_email|escape:'url'}">{$line.user_email|escape}</a></td>
           <td><a href="tel:{$line.user_phone|escape:'url'}">{$line.user_phone|escape}</a></td>
           <td><a href="{mkurl action="section" page="accept" user=$line.user_id section=$section->section_id}" class="btn btn-warning"><span class="glyphicon-thumbs-down glyphicon"></span></td>

@@ -58,8 +58,8 @@
       <strong>Prenom : </strong>{$user.user_firstname|escape}<br/>
       <strong>ID : </strong>{$user.user_id}<br/>
       <strong>Ecole : </strong>{$user.ut_name}<br/>
-      <strong>Promotion : </strong>{$user.user_promo}<br/>
-      <strong>Login IONIS : </strong>{$user.user_login}<br/>
+      <strong>Promotion : </strong>{$user.user_promo|escape}<br/>
+      <strong>Login IONIS : </strong>{$user.user_login|escape}<br/>
       <strong>email : </strong><a href="mailto:{$user.user_email|escape:'url'}">{$user.user_email|escape}</a><br/>
       <strong>Téléphone : </strong><a href="tel:{$user.user_phone|escape:'url'}">{$user.user_phone|escape}</a><br/>
       <strong>Accès : </strong>{$user.user_role}</p>
@@ -76,7 +76,7 @@
     {elseif isset($intra->picture) and $intra->picture != ""}
         <img  width="150px" src="{$intra->picture}" />
     {elseif $bocal.school == "epita" and $bocal.promo >= 2015}
-        <img  width="150px" src="http://static.acu.epita.fr/photos/{if $user.user_promo > 0}{$user.user_promo}{else}{$bocal.promo}{/if}/{$bocal.login}" />
+        <img  width="150px" src="http://static.acu.epita.fr/photos/{if $user.user_promo > 0}{$user.user_promo|escape:'url'}{else}{$bocal.promo}{/if}/{$bocal.login}" />
     {else}
         <img width="150px" alt="Pas d'image" src="https://intra-bocal.epitech.eu/trombi/{$bocal.login}.jpg" />
     {/if}
@@ -189,57 +189,57 @@
                 </dd>
                 {if isset($intra->userinfo->email)}
                     <dt>PERSO: email</dt>
-                    <dd><a href="mailto:{$intra->userinfo->email->value}">{$intra->userinfo->email->value}</a></dd>
+                    <dd><a href="mailto:{$intra->userinfo->email->value|escape:'url'}">{$intra->userinfo->email->value|escape}</a></dd>
                     {/if}
                     {if isset($intra->userinfo->address)}
                     <dt>PERSO: adresse</dt>
-                    <dd>{$intra->userinfo->address->value}</dd>
+                    <dd>{$intra->userinfo->address->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->city)}
                     <dt>PERSO: ville</dt>
-                    <dd>{$intra->userinfo->city->value}</dd>
+                    <dd>{$intra->userinfo->city->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->country)}
                     <dt>PERSO: pays</dt>
-                    <dd>{$intra->userinfo->country->value}</dd>
+                    <dd>{$intra->userinfo->country->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->telephone)}
                     <dt>PERSO: téléphone</dt>
-                    <dd><a href="tel:{$intra->userinfo->telephone->value}">{$intra->userinfo->telephone->value}</a></dd>
+                    <dd><a href="tel:{$intra->userinfo->telephone->value|escape:'url'}">{$intra->userinfo->telephone->value|escape}</a></dd>
                     {/if}
                     {if isset($intra->userinfo->website)}
                     <dt>PERSO: site web</dt>
-                    <dd><a href="{$intra->userinfo->website->value}">{$intra->userinfo->website->value}</a></dd>
+                    <dd><a href="{$intra->userinfo->website->value|escape:'url'}">{$intra->userinfo->website->value|escape}</a></dd>
                     {/if}
                     {if isset($intra->userinfo->job)}
                     <dt>PERSO: métier</dt>
-                    <dd>{$intra->userinfo->job->value}</dd>
+                    <dd>{$intra->userinfo->job->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->poste)}
                     <dt>PERSO: poste</dt>
-                    <dd>{$intra->userinfo->poste->value}</dd>
+                    <dd>{$intra->userinfo->poste->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->birthplace)}
                     <dt>PERSO: lieu de naissance</dt>
-                    <dd>{$intra->userinfo->birthplace->value}</dd>
+                    <dd>{$intra->userinfo->birthplace->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->birthday)}
                     <dt>PERSO: date de naissance</dt>
-                    <dd>{$intra->userinfo->birthday->value}</dd>
+                    <dd>{$intra->userinfo->birthday->value|escape}</dd>
                 {/if}
                 {if isset($intra->userinfo->facebook)}
                     <dt>PERSO: facebook</dt>
-                    <dd><a href="{$intra->userinfo->facebook->value}">{$intra->userinfo->facebook->value}</a></dd>
+                    <dd><a href="{$intra->userinfo->facebook->value|escape:'url'}">{$intra->userinfo->facebook->value|escape}</a></dd>
                     {/if}
                     {if isset($intra->userinfo->twitter)}
                     <dt>PERSO: twitter</dt>
                     <dd>
-                      <a href="{$intra->userinfo->twitter->value}">{$intra->userinfo->twitter->value}</a>
+                      <a href="{$intra->userinfo->twitter->value|escape:'url'}">{$intra->userinfo->twitter->value|escape}</a>
                     </dd>
                 {/if}
                 {if isset($intra->userinfo->googleplus)}
                     <dt>PERSO: google plus</dt>
-                    <dd><a href="{$intra->userinfo->googleplus->value}">{$intra->userinfo->googleplus->value}</a></dd>
+                    <dd><a href="{$intra->userinfo->googleplus->value|escape:'url'}">{$intra->userinfo->googleplus->value|escape}</a></dd>
                     {/if}
                 <dt>Localisation</dt>
                 <dd>{$intra->location}</dd>
@@ -279,7 +279,7 @@
               {if isset($intra->picture) and $intra->picture != ""}
                   <img  width="150px" src="{$intra->picture}" />
               {elseif $bocal.school == "epita" and $bocal.promo >= 2015}
-                  <img  width="150px" src="http://static.acu.epita.fr/photos/{if $user.user_promo > 0}{$user.user_promo}{else}{$bocal.promo}{/if}/{$bocal.login}" />
+                  <img  width="150px" src="http://static.acu.epita.fr/photos/{if $user.user_promo > 0}{$user.user_promo|escape:'url'}{else}{$bocal.promo}{/if}/{$bocal.login}" />
               {else}
                   <img width="150px" alt="Pas d'image" src="https://intra-bocal.epitech.eu/trombi/{$bocal.login}.jpg" />
               {/if}

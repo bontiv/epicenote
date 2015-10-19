@@ -17,6 +17,7 @@ function _api_config() {
         'userinfo_endpoint' => $baseAPI . '/userinfo',
         'check_session_iframe' => $baseAPI . '/check_session',
         'end_session_endpoint' => $baseAPI . '/end_session',
+        'registration_endpoint' => $baseAPI . '/register',
         'jwks_uri' => $baseAPI . '/jwks.json',
         'registration_endpoint' => $baseAPI . '/register',
         'scopes_supported' => array('openid'),
@@ -380,4 +381,8 @@ function api_userinfo() {
 
     echo json_encode($infos);
     quit();
+}
+
+function api_register() {
+    
 }
