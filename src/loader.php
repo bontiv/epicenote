@@ -90,28 +90,27 @@ while ($dat = $conf->fetch()) {
 if (!CONSOLE) {
 
 
-    if (!isset($action)) {
-        // Etape 2, calcul du chemin d'execution
-        if (!isset($_REQUEST['action']))
-            redirect('index');
+    // Etape 2, calcul du chemin d'execution
+    $action = 'index';
+    if (isset($_GET['action']))
+        $action = $_GET['action'];
+    $action = basename($action);
 
-        $action = null;
-        if (isset($_GET['action']))
-            $action = $_GET['action'];
-        $action = basename($action);
-    }
-
-    if (!isset($page)) {
-        $page = 'index';
-        if (isset($_GET['page']))
-            $page = $_GET['page'];
-        $page = basename($page);
-    }
+    $page = 'index';
+    if (isset($_GET['page']))
+        $page = $_GET['page'];
+    $page = basename($page);
 
     if (!file_exists($root . 'action' . DS . $action . '.php')) {
         $action = 'syscore';
         $page = 'nomod';
     }
+
+    //Auto deconnexion sur temps trop long
+    if (isset($_SESSION['user'], $_SESSION['tps']) && $_SESSION['user'] && $_SESSION['tps'] + $config['cms']['wait_logout'] * 60 < time()) {
+        modexec('index', 'logout');
+    }
+    $_SESSION['tps'] = time();
 
     //Etape 3, verification XSRF
     if (isset($_SESSION['urltok']) && (!isset($_GET['_']) || $_GET['_'] != $_SESSION['urltok'])) {
@@ -121,6 +120,10 @@ if (!CONSOLE) {
     if (isset($_SESSION['user'], $_SERVER['HTTP_REFERER']) && $_SERVER['REQUEST_METHOD'] == 'POST' && parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) != $_SERVER['HTTP_HOST']) {
         modexec('index', 'logout');
     }
+
+    // Redirection si pas d'action défini
+    if (!isset($_REQUEST['action']))
+        redirect('index');
 
     // Etape 4, vérification des droits d'accès
     if (!isset($_SESSION['user']))

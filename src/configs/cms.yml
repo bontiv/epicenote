@@ -1,0 +1,7 @@
+name: cms
+label: Intranet
+fields:
+    wait_logout:
+        type: int
+        label: Temps (mins) avant déconnexion
+        default: 1
