@@ -619,3 +619,29 @@ function section_send() {
 
     display();
 }
+
+function section_trombi() {
+
+
+    $mdl = new Modele('sections');
+    $mdl->fetch($_REQUEST['section']);
+    $mdl->assignTemplate('section');
+
+    $usr = new Modele('user_sections');
+
+    // Managers
+    $usr->find(array(
+        'us_section' => $mdl->section_id,
+        'us_type' => 'manager',
+    ));
+    $usr->appendTemplate('managers');
+
+    //Staffs
+    $usr->find(array(
+        'us_section' => $mdl->section_id,
+        'us_type' => 'user',
+    ));
+    $usr->appendTemplate('users');
+
+    display();
+}

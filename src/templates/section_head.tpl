@@ -16,6 +16,7 @@
   {/if}
   <a href="{mkurl action="section" page="mkevent" section=$section->section_id}" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Créer event</a>
   <a href="{mkurl action="section" page="addpoints" section=$section->section_id}" class="btn btn-default"><span class="glyphicon glyphicon-gift"></span> Donner des points</a>
+  <a href="{mkurl action="section" page="trombi" section=$section->section_id}" class="btn btn-default"><span class="glyphicon glyphicon-camera"></span> Trombinoscope</a>
 </div>
 
 {* Les onglets *}

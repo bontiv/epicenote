@@ -42,6 +42,7 @@
               <td>{$line.user_name|escape}</td>
               <td>
                 <div class="btn-group">
+                  {acl action="section" page="trombi"}<a href="{mkurl action="section" page="trombi" section=$line.section_id}" title="Trombinoscope" class="btn btn-default"><i class="glyphicon glyphicon-camera"></i></a>{/acl}
                   {acl level="ADMINISTRATOR"}<a href="{mkurl action="section" page="delete" section=$line.section_id}" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></a>{/acl}
                   {acl level="ADMINISTRATOR"}<a href="{mkurl action="section" page="edit" section=$line.section_id}" class="btn btn-warning"><i class="glyphicon glyphicon-pencil"></i></a>{/acl}
                     {if $line.inType}
