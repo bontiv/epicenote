@@ -2,7 +2,7 @@
 
 <ol class="breadcrumb">
   <li><a href="{mkurl action="section"}">Sections</a></li>
-  <li><a href="{mkurl action="section" page="details" section=$section->section_id}">{$section->section_name}</a></li>
+  <li><a href="{mkurl action="section" page="details" section=$section->section_id}">{$section->section_name|escape}</a></li>
   <li class="active">Groupes de diffusion</li>
 </ol>
 
@@ -30,13 +30,13 @@
                 {/if}
 
                 {if $group.isSection}
-                    {$group.obj->name}
+                    {$group.obj->name|escape}
                 {else}
-                    <a href="{mkurl action="section" page="admin_ml" section=$section->section_id ml=$group.obj->id}">{$group.obj->name}</a>
+                    <a href="{mkurl action="section" page="admin_ml" section=$section->section_id ml=$group.obj->id}">{$group.obj->name|escape}</a>
                 {/if}
               </td>
-              <td>{$group.obj->email}</td>
-              <td>{$group.obj->description}</td>
+              <td><a class="btn btn-default btn-sm" title="Envoer un email en tant que..." href="{mkurl action="section" page="send" section=$section->section_id from=$group.obj->id}"><span class="glyphicon glyphicon-send"></span></a> {$group.obj->email|escape}</td>
+              <td>{$group.obj->description|escape}</td>
             </tr>
         {/foreach}
       </tbody>

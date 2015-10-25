@@ -572,3 +572,50 @@ function section_admin_ml_noadmin() {
         "ml" => $lnk->sm_ml,
     ));
 }
+
+function section_send() {
+    global $srcdir, $tpl;
+
+    $mdl = new Modele('sections');
+    $mdl->fetch($_REQUEST['section']);
+    $mdl->assignTemplate('section');
+
+    include $srcdir . '/libs/GoogleApi.php';
+
+    $ml = new Modele('section_ml');
+    $ml->find(array(
+        'sm_section' => $_REQUEST['section'],
+        'sm_ml' => $_REQUEST['from'],
+    ));
+
+    if ($ml->next()) {
+        $mlid = $ml->sm_ml;
+    } elseif ($mdl->section_ml != '') {
+        $mlid = $mdl->section_ml;
+    } else {
+        modexec('syscore', 'no_object');
+    }
+
+    $api = new GoogleApi();
+    $grp = $api->getGroupsDetails($mlid);
+    $tpl->assign('mail', $grp);
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $mailer = getMailer();
+        $mailer->AddReplyTo($grp->email, $grp->name);
+        $mailer->FromName = $grp->name;
+
+        foreach (explode(';', $_POST['recipients']) as $receip) {
+            $receip = trim($receip);
+            if ($receip) {
+                $mailer->AddAddress(trim($receip));
+            }
+        }
+
+        $mailer->Subject = "[EPITANIME] $_POST[subject]";
+        $mailer->Body = $_POST['ebody'];
+        $tpl->assign('hsuccess', $mailer->Send());
+    }
+
+    display();
+}
