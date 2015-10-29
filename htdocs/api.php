@@ -33,3 +33,4 @@ if ($_SERVER['PATH_INFO'] == '/.well-known/openid-configuration') {
 }
 
 require_once $srcdir . DIRECTORY_SEPARATOR . 'loader.php';
+run();

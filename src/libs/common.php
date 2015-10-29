@@ -642,3 +642,74 @@ function getMailer() {
 
     return $m;
 }
+
+/**
+ * Security - Session timeout
+ * @param type $enabled
+ */
+function securityTime($enabled = true) {
+    global $config;
+
+    if ($enabled) {
+        //Auto deconnexion sur temps trop long
+        if (isset($_SESSION['user'], $_SESSION['tps']) && $_SESSION['user'] && $_SESSION['tps'] + $config['cms']['wait_logout'] * 60 < time()) {
+            modexec('index', 'logout');
+        }
+        $_SESSION['tps'] = time();
+    } else {
+        unset($_SESSION['tps'], $_SESSION['tps']);
+    }
+}
+
+/**
+ * Security - Check CSRF
+ * @param type $enabled
+ */
+function securityCSRF($enabled = true) {
+    global $CSRF_withelist, $action, $page;
+
+    if ($enabled) {
+        // Stop if whitelist
+        if (isset($CSRF_withelist[$action]) && in_array($page, $CSRF_withelist[$action])) {
+            return;
+        }
+
+        // Stop if not enabled
+        if (!isset($_SESSION['urltok'])) {
+            return;
+        }
+
+        // Test CSRF
+        if ((!isset($_GET['_']) || $_GET['_'] != $_SESSION['urltok'])) {
+
+            modexec('index', 'logout');
+        }
+
+        if (isset($_SESSION['user'], $_SERVER['HTTP_REFERER']) && $_SERVER['REQUEST_METHOD'] == 'POST' && parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) != $_SERVER['HTTP_HOST']) {
+            modexec('index', 'logout');
+        }
+    } else {
+        unset($_SESSION['urltok']);
+    }
+}
+
+/**
+ * Main CMS execution
+ * @param type $action
+ * @param type $page
+ */
+function run($action = null, $page = null) {
+    if ($action == null) {
+        $action = $GLOBALS['action'];
+    }
+
+    if ($page == null) {
+        $page = $GLOBALS['page'];
+    }
+
+    modsecu($action, $page, $_GET);
+    needAcl(getAclLevel($action, $page), $action, $page, $_GET);
+    modexec($action, $page);
+    modexec('syscore', 'moderror');
+    quit();
+}

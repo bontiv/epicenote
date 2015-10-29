@@ -86,46 +86,25 @@ while ($dat = $conf->fetch()) {
     $config[$parts[0]][$parts[1]] = $dat['value'];
 }
 
-//Etapes 2 à 4 seulement si HTTP
+//CSRF Whitelist
+$CSRF_withelist = array(
+    'index' => array(
+        'index',
+        'login',
+    ),
+    'api' => array(
+        'authorize',
+    ),
+    'wifi' => array(
+        'login',
+    ),
+);
+
+//Etapes seulement si HTTP
 if (!CONSOLE) {
 
 
-    // Etape 2, calcul du chemin d'execution
-    $action = 'index';
-    if (isset($_GET['action']))
-        $action = $_GET['action'];
-    $action = basename($action);
-
-    $page = 'index';
-    if (isset($_GET['page']))
-        $page = $_GET['page'];
-    $page = basename($page);
-
-    if (!file_exists($root . 'action' . DS . $action . '.php')) {
-        $action = 'syscore';
-        $page = 'nomod';
-    }
-
-    //Auto deconnexion sur temps trop long
-    if (isset($_SESSION['user'], $_SESSION['tps']) && $_SESSION['user'] && $_SESSION['tps'] + $config['cms']['wait_logout'] * 60 < time()) {
-        modexec('index', 'logout');
-    }
-    $_SESSION['tps'] = time();
-
-    //Etape 3, verification XSRF
-    if (isset($_SESSION['urltok']) && (!isset($_GET['_']) || $_GET['_'] != $_SESSION['urltok'])) {
-        modexec('index', 'logout');
-    }
-
-    if (isset($_SESSION['user'], $_SERVER['HTTP_REFERER']) && $_SERVER['REQUEST_METHOD'] == 'POST' && parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST) != $_SERVER['HTTP_HOST']) {
-        modexec('index', 'logout');
-    }
-
-    // Redirection si pas d'action défini
-    if (!isset($_REQUEST['action']))
-        redirect('index');
-
-    // Etape 4, vérification des droits d'accès
+    // Vérification des droits d'accès
     if (!isset($_SESSION['user']))
         $_SESSION['user'] = false;
     $tpl->assign('_user', $_SESSION['user']);
@@ -137,12 +116,4 @@ if (!CONSOLE) {
         while ($line = $sections->fetch())
             $_SESSION['user']['sections'][$line['section_id']] = $line;
     }
-
-    modsecu($action, $page, $_GET);
-    needAcl(getAclLevel($action, $page), $action, $page, $_GET);
-
-    // Etape 5 lancement du module
-    modexec($action, $page);
-    modexec('syscore', 'moderror');
-    quit();
 }
