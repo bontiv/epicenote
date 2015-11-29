@@ -28,7 +28,7 @@ if (file_exists(dirname(__FILE__) . '/bootstrap.php')) {
     );
 } else {
     $variables = array(
-        'dsn' => 'mysql:host=localhost;dbname=epicenote',
+        'dsn' => 'mysql:host=localhost;dbname=epicenote;charset=utf8',
         'db_user' => 'epicenote',
         'db_pass' => 'epicenote',
         'env' => 'def',
@@ -494,10 +494,10 @@ function tpl_pge_dbsync() {
           <h3>Requêtes SQL à exécuter</h3>
           <p>Voilà le fichier SQL généré qui sera exécuté sur la base de donnée.</p>
           <p><pre>
-                                        # ------------------------------------------------------------
-                                        # Fichier SQL généré par le système d'installation automatique
-                                        # @Copyright bonnetlive
-                                        # ------------------------------------------------------------
+                                            # ------------------------------------------------------------
+                                            # Fichier SQL généré par le système d'installation automatique
+                                            # @Copyright bonnetlive
+                                            # ------------------------------------------------------------
 
             <?php
             echo "\n";
