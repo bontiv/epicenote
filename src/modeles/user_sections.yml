@@ -29,4 +29,3 @@ indexes:
   us_section:
     type: index
     fields: [us_section]
-    

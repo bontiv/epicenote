@@ -1,0 +1,24 @@
+## YAML Template.
+## Event web site
+---
+name: ews
+key: ews_id
+fields:
+  ews_id:
+    type: auto_int
+  ews_name:
+    type: var
+    label: Nom
+  ews_section:
+    type: external
+    table: sections
+    display: %section_name%
+    label: Section
+  ews_url:
+    type: var
+    size: 250
+    label: URL api
+indexes:
+  idx_ews_section:
+    type: index
+    fields: [ews_section]

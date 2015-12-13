@@ -1,0 +1,20 @@
+## Table event_ews
+name: event_ews
+key: ee_id
+fields:
+  ee_id:
+    type: auto_int
+  ee_event:
+    type: external
+    table: events
+    display: %event_name%
+  ee_ews:
+    type: external
+    table: ews
+    display: %ews_name%
+  ee_ews_id:
+    type: int
+indexes:
+  idx_ee_event:
+    type: index
+    fields: ee_event

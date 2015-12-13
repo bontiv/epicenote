@@ -6,6 +6,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-select.css" rel="stylesheet">
     <link href="css/jquery-ui-1.10.4.custom.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
     <!-- /Css -->
     <!-- Scripts -->
     <script src="js/jquery.js"></script>
@@ -82,6 +83,7 @@
                 <li><a href="{mkurl action="cards"}">Gestion des cartes</a></li>
                 <li><a href="{mkurl action="wifi"}">Gestion du wifi</a></li>
                 <li><a href="{mkurl action="config"}">Configurations</a></li>
+                <li><a href="{mkurl action="ews" page="adm_list"}">Sites web event</a></li>
               </ul>
             </li>
             {/acl}

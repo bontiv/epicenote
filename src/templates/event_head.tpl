@@ -25,4 +25,5 @@
   <li class="disabled"><a>Participants</a></li>
   <li class="disabled"><a>Fiche event</a></li>
   <li class="{if $smarty.get.page == "bocal_list"}active{/if}"><a href="{mkurl action="event" page="bocal_list" event=$event.event_id}">Tickets Bocal</a></li>
+  <li class="{if $smarty.get.page == "ews_list"}active{/if}"><a href="{mkurl action="event" page="ews_list" event=$event.event_id}">Préinscription</a></li>
 </ul>

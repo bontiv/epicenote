@@ -614,3 +614,204 @@ function event_staff_add() {
         redirect('event', 'staff', array('section' => $_REQUEST['section'], 'event' => $_REQUEST['event'], 'hsuccess' => 1));
     }
 }
+
+function event_ews_list() {
+    global $pdo, $tpl, $srcdir;
+
+    require $srcdir . '/libs/ews.php';
+
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event) {
+        modexec('syscore', 'notfound');
+    }
+    $tpl->assign('event', $event);
+
+    $mdl = new Modele('ews');
+    $mdl->find(array('ews_section' => $event['event_section']));
+    $ews = array();
+    while ($ewsl = $mdl->next()) {
+        $ews[$ewsl['ews_id']] = $ewsl['ews_name'];
+    }
+
+    $ee = new Modele('event_ews');
+    $ee->find(array('ee_event' => $event['event_id']));
+    while ($eel = $ee->next()) {
+        $eel['ews_name'] = $ee->ee_ews->ews_name;
+        unset($ews[$eel['ee_ews']]);
+        $api = new EWS($ee->ee_ews->ews_url);
+        $answers = $api->getTournament($ee->ee_ews_id)->getResult();
+        $row = array_merge($eel, $answers[0]);
+        $tpl->append('ee', $row);
+    }
+
+    $tpl->assign('ews', $ews);
+    display();
+}
+
+function event_ews_add() {
+    global $pdo, $tpl, $srcdir;
+
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event) {
+        modexec('syscore', 'notfound');
+    }
+
+    require $srcdir . '/libs/ews.php';
+
+    $ews = new Modele('ews');
+    $ews->fetch($_POST['ews_id']);
+    $api = new EWS($ews->ews_url);
+
+    try {
+        $id = $api->addTournament(
+                        uniqid(), $event['event_name'], $event['event_desc'], $event['event_start']
+                )->getResult();
+
+        $mdl = new Modele('event_ews');
+        if ($mdl->addFrom(array(
+                    'ee_event' => $event['event_id'],
+                    'ee_ews' => $ews->getKey(),
+                    'ee_ews_id' => $id,
+                ))) {
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 1,
+            ));
+        } else {
+            // Fail Add event ews
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 0,
+            ));
+        }
+        quit();
+    } catch (EWS_Error $e) {
+        redirect('event', 'ews_list', array(
+            'event' => $event['event_id'],
+            'hsuccess' => 0,
+        ));
+    }
+}
+
+function event_ews_del() {
+    global $pdo, $tpl, $srcdir;
+
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event) {
+        modexec('syscore', 'notfound');
+    }
+
+    require $srcdir . '/libs/ews.php';
+
+    $ews = new Modele('event_ews');
+    $ews->find(array('ee_event' => $event['event_id'], 'ee_id' => $_REQUEST['ews']));
+    if ($ews->next()) {
+        $api = new EWS($ews->ee_ews->ews_url);
+
+        try {
+            $api->delTournament($ews->ee_ews_id)->getResult();
+            $ews->delete();
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 1,
+            ));
+        } catch (EWS_Error $e) {
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 0,
+            ));
+        }
+    } else {
+        //No EWS
+        echo 'Internal ERROR';
+        quit();
+    }
+}
+
+function event_ews_lock() {
+    global $pdo, $tpl, $srcdir;
+
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event) {
+        modexec('syscore', 'notfound');
+    }
+
+    require $srcdir . '/libs/ews.php';
+
+    $ews = new Modele('event_ews');
+    $ews->find(array('ee_event' => $event['event_id'], 'ee_id' => $_REQUEST['ews']));
+    if ($ews->next()) {
+        $api = new EWS($ews->ee_ews->ews_url);
+
+        try {
+            $api->lockTournament($ews->ee_ews_id, $_REQUEST['lock'])->getResult();
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 1,
+            ));
+        } catch (EWS_Error $e) {
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 0,
+            ));
+        }
+    } else {
+        //No EWS
+        echo 'Internal ERROR';
+        quit();
+    }
+}
+
+function event_ews_print() {
+    global $pdo, $tpl, $srcdir;
+
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event) {
+        modexec('syscore', 'notfound');
+    }
+
+    require $srcdir . '/libs/ews.php';
+    $order = isset($_REQUEST['order']) ? $_REQUEST['order'] : 'tu_id';
+
+    $ews = new Modele('event_ews');
+    $ews->find(array('ee_event' => $event['event_id'], 'ee_id' => $_REQUEST['ews']));
+    if ($ews->next()) {
+        $api = new EWS($ews->ee_ews->ews_url);
+        try {
+            $users = $api->getUsers($ews->ee_ews_id, $order)->getResult();
+            $tpl->assign('users', $users);
+            $tpl->assign('event', $event);
+            $ews->assignTemplate('ews');
+            display();
+        } catch (EWS_Error $e) {
+            redirect('event', 'ews_list', array(
+                'event' => $event['event_id'],
+                'hsuccess' => 0,
+            ));
+        }
+    } else {
+        //No EWS
+        echo 'Internal ERROR';
+        quit();
+    }
+}
