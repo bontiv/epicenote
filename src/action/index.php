@@ -510,7 +510,7 @@ function index_password_change() {
         if ($success) {
             unset($_SESSION['index_password_code']);
             $_SESSION['user'] = $mdl->toArray();
-            $_SESSION['user']['role'] = aclFromText($mdl->user_role);
+            $_SESSION['user']['role'] = aclFromText($mdl->raw_user_role);
             $tpl->assign('_user', $_SESSION['user']);
             modexec('index');
         }
