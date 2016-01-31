@@ -30,3 +30,8 @@ body {
     padding-right: 15px;
     padding-left: 15px;
 }
+
+
+.form-hours {
+    width: 80px;
+}
