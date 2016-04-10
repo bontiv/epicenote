@@ -40,7 +40,7 @@
           <th>Date fin</th>
           <th>Description</th>
           <th>Coef</th>
-          <th style="min-width: 30px">Action</th>
+          <th style="min-width: 100px">Action</th>
         </tr>
       </thead>
       <tbody>
