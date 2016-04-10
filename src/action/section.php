@@ -39,7 +39,9 @@ function section_mkevent() {
 
     if (isset($_POST['event_name'])) {
         $dateStart = new DateTime($_POST['event_start']);
+        $dateStart->setTime($_POST['event_start_hours'], $_POST['event_start_mins'], 0);
         $dateEnd = new DateTime($_POST['event_end']);
+        $dateEnd->setTime($_POST['event_end_hours'], $_POST['event_end_mins'], 0);
         $sevenDays = new DateInterval('P7D');
         $dateLock = new DateTime($dateStart->format('Y-m-d H:i:s'));
         $dateLock->sub($sevenDays);
@@ -47,6 +49,8 @@ function section_mkevent() {
         $dateNote1->add($sevenDays);
         $dateNote2 = new DateTime($dateNote1->format('Y-m-d H:i:s'));
         $dateNote2->add($sevenDays);
+
+        unset($_REQUEST['event_start_hours'], $_REQUEST['event_start_mins'], $_REQUEST['event_end_hours'], $_REQUEST['event_end_mins']);
 
         $extra = array(
             'event_start' => $dateStart->format('Y-m-d H:i:s'),
