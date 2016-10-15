@@ -20,6 +20,7 @@ include $srcdir . '/loader.php';
 $cronActions = array(
     "bocal:update",
     "user:execSync",
+    "user:remove_old",
     "ml:execUpdate",
 );
 

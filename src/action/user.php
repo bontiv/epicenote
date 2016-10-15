@@ -51,7 +51,7 @@ function user_sync2() {
     } while ($pageToken !== null);
 
     $mdl = new Modele('users');
-    $mdl->find();
+    $mdl->find('user_role = "USER" OR user_role = "ADMINISTRATOR"');
     while ($mdl->next()) {
         $Sregistred[] = strtolower($mdl->user_email);
     }
