@@ -4,7 +4,7 @@
 
 <footer class="footer">
   <div class="container">
-    <p class="text-muted">&COPY; EPITANIME 2012 - 2015</p>
+    <p class="text-muted">&COPY; EPITANIME 2012 - 2016</p>
   </div>
 </footer>
 

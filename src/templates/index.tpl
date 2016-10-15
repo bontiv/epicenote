@@ -1,28 +1,5 @@
 {include "head.tpl"}
 
-{* Lib pour le Dock *}
-<script type="text/javascript" src="js/dock.js"></script>
-
-<div class="dock-container hidden-xs">
-  <div class="dock">
-    <ul>
-      {acl action="toyunda"}
-      <li><span>Karaoke</span><a href="{mkurl action="toyunda"}"><img src="images/dock/karaoke.png"/></a></li>
-          {/acl}
-          {acl action="tcg"}
-      <li><span>TCG</span><a href="http://palm.com"><img src="images/dock/tcg.png"/></a></li>
-          {/acl}
-          {acl action="event"}
-      <li><span>Events</span><a href="{mkurl action="event"}"><img src="images/dock/events.png"/></a></li>
-          {/acl}
-          {if $_user}
-        <li><span>Association</span><a href="{mkurl action="index" page="profile"}"><img src="images/dock/tools.png"/></a></li>
-          {/if}
-    </ul>
-    <div class="base"></div>
-  </div>
-</div>
-
 <ul class="nav nav-pills" role="pilllist">
   <li role="presentation" class="active"><a role="pill" data-toggle="pill" aria-controls="dashboard" href="#dashboard">Accueil</a></li>
   <li role="presentation"><a role="pill" data-toggle="pill" aria-controls="markfaq" href="#markfaq">FAQ Notation</a></li>
