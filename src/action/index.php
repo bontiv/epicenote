@@ -169,7 +169,7 @@ function index_profile() {
     }
 
     $mdt = new Modele('mandate');
-    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now()')) {
+    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now()', 'mandate_end DESC')) {
         while ($line = $mdt->next()) {
             $tpl->append('mandate', $line);
         }
