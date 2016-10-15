@@ -511,3 +511,19 @@ function user_setcompta() {
 
     redirect("user", "view", array('hsuccess' => 0, 'user' => $usr->getKey()));
 }
+
+function user_remove_old() {
+    global $pdo;
+
+    $subsql = 'SELECT count(*) '
+            . 'FROM user_mandate '
+            . 'LEFT JOIN mandate ON um_mandate = mandate_id '
+            . 'WHERE um_user = user_id AND mandate_end > now()';
+
+    $sql = 'UPDATE `users` '
+            . 'SET user_role = "GUEST" '
+            . 'WHERE user_role = "USER" AND (' . $subsql . ') = 0';
+
+    $result = $pdo->exec($sql);
+    redirect('user', 'index', array('hsuccess' => $result !== false));
+}

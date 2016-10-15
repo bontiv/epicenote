@@ -90,7 +90,7 @@
   <a class="btn btn-link" href="#" onclick="sendToClipboard();
           return false;"><i class="glyphicon glyphicon-share" title="Copier dans le presse papier"></i> Presse-papier</a>
   <a class="btn btn-link" href="{mkurl action="user" page="sync2"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-export"></i> GoogleSync</a>
-
+  <a class="btn btn-link" href="{mkurl action="user" page="remove_old"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i> Retrait anciens</a>
   <ul class="pager">
     {if $ptable.showPrev}
         <li><a href="{$ptable.prev}"><i class="glyphicon glyphicon-arrow-left"></i> Précédent</a></li>
