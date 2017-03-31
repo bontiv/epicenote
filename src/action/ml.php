@@ -32,6 +32,20 @@ function ml_index() {
     display();
 }
 
+function _ml_all_members($group) {
+    $api = new GoogleApi();
+
+    $members = $api->getGroupMembers($_GET['ml']);
+    $allMbrs = $members->members;
+
+    while (property_exists($members, 'nextPageToken')) {
+        $members = $api->getGroupMembers($group, $members->nextPageToken);
+        $allMbrs = array_merge($allMbrs, $members->members);
+    }
+
+    return $allMbrs;
+}
+
 function ml_view() {
     global $tpl, $pdo;
 
@@ -39,9 +53,8 @@ function ml_view() {
     $details = $api->getGroupsDetails($_GET['ml']);
     $tpl->assign('group', $details);
 
-    $members = $api->getGroupMembers($_GET['ml']);
     $usql = $pdo->prepare('SELECT * FROM users WHERE user_email = ?');
-    foreach ($members->members as $member) {
+    foreach (_ml_all_members($_GET['ml']) as $member) {
         $usql->bindValue(1, $member->email);
         $usql->execute();
         $user = $usql->fetch();
@@ -120,8 +133,7 @@ function ml_autoUpdate() {
             $toAdd[$section->getKey()][] = strtolower($Lmembers->us_user->user_email);
         }
 
-        $reelMembers = $api->getGroupMembers($section->section_ml);
-        foreach ($reelMembers->members as $member) {
+        foreach (_ml_all_members($section->section_ml) as $member) {
             $key = array_keys($toAdd[$section->getKey()], strtolower($member->email));
             if (strpos($member->email, 'save_') !== 0) { //Skip sauvegarde
                 if ($member->type == "GROUP") {
@@ -160,18 +172,15 @@ function ml_execUpdate() {
             $toAdd[] = strtolower($Lmembers->us_user->user_email);
         }
 
-        $reelMembers = $api->getGroupMembers($section->section_ml);
-        if (isset($reelMembers->members)) {
-            foreach ($reelMembers->members as $member) {
-                $key = array_keys($toAdd, strtolower($member->email));
-                if (strpos($member->email, 'save_') !== 0) { //Skip sauvegarde
-                    if ($member->type == "GROUP") {
-                        continue;
-                    } elseif (count($key) == 0) {
-                        $toDelete[] = strtolower($member->email);
-                    } else {
-                        unset($toAdd[$key[0]]);
-                    }
+        foreach (_ml_all_members($section->section_ml) as $member) {
+            $key = array_keys($toAdd, strtolower($member->email));
+            if (strpos($member->email, 'save_') !== 0) { //Skip sauvegarde
+                if ($member->type == "GROUP") {
+                    continue;
+                } elseif (count($key) == 0) {
+                    $toDelete[] = strtolower($member->email);
+                } else {
+                    unset($toAdd[$key[0]]);
                 }
             }
         }

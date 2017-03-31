@@ -172,10 +172,10 @@ function user_index() {
         quit();
     }
 
-    $where = '';
+    $where = 'WHERE user_status != "DELETE"';
 
     if (isset($_GET['search'])) {
-        $where = 'WHERE user_name LIKE ? '
+        $where .= ' user_name LIKE ? '
                 . 'OR user_lastname LIKE ? '
                 . 'OR user_firstname LIKE ? '
                 . 'OR user_email LIKE ? ';
@@ -226,14 +226,10 @@ function user_add() {
  * Suppresion d'un utilisateur
  */
 function user_delete() {
-    global $pdo;
-
-    $sql = $pdo->prepare('DELETE FROM users WHERE user_id = ?');
-    $sql->bindValue(1, $_GET['user']);
-    if ($sql->execute())
-        redirect('user');
-    else
-        modexec('syscore', 'sqlerror');
+    $mdl = new Modele('users');
+    $mdl->fetch($_GET['user']);
+    $mdl->user_status = 'DELETE';
+    redirect('user', 'index', array('hsuccess' => 1));
 }
 
 /**

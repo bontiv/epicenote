@@ -76,6 +76,18 @@ fields:
       SUPERUSER: Utilisateur acrédité
       ADMINISTRATOR: Administrateur
 
+  user_status:
+      type: enum
+      default: ACTIVE
+      visible: admin
+      label: Statut du compte
+      readonly: true
+      items:
+          ACTIVE: Compte activé
+          NOMAIL: Mailling désactivé
+          DISABLED: Suspendu
+          DELETE: Supprimé
+
   user_compta:
       type: int
       label: Compte par défaut

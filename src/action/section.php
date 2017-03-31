@@ -152,13 +152,13 @@ function section_details() {
     $tpl->assign('section', $section);
 
 
-    $sql = $pdo->prepare('SELECT * FROM user_sections LEFT JOIN users ON user_id = us_user WHERE us_section = ? AND us_type="manager"');
+    $sql = $pdo->prepare('SELECT * FROM user_sections LEFT JOIN users ON user_id = us_user WHERE us_section = ? AND us_type="manager" AND user_status != "DELETE"');
     $sql->bindValue(1, $section->section_id);
     $sql->execute();
     while ($line = $sql->fetch())
         $tpl->append('managers', $line);
 
-    $sql = $pdo->prepare('SELECT * FROM user_sections LEFT JOIN users ON user_id = us_user WHERE us_section = ? AND us_type="user"');
+    $sql = $pdo->prepare('SELECT * FROM user_sections LEFT JOIN users ON user_id = us_user WHERE us_section = ? AND us_type="user" AND user_status != "DELETE"');
     $sql->bindValue(1, $section->section_id);
     $sql->execute();
     while ($line = $sql->fetch())
@@ -637,6 +637,7 @@ function section_trombi() {
     $usr->find(array(
         'us_section' => $mdl->section_id,
         'us_type' => 'manager',
+        'user_status != "DELETE"',
     ));
     $usr->appendTemplate('managers');
 
@@ -644,6 +645,7 @@ function section_trombi() {
     $usr->find(array(
         'us_section' => $mdl->section_id,
         'us_type' => 'user',
+        'user_status != "DELETE"',
     ));
     $usr->appendTemplate('users');
 
