@@ -166,10 +166,7 @@ function user_index() {
     global $pdo, $tpl;
 
     if (isset($_POST['search'])) {
-        header('location: ' . urldup(array(
-                    'search' => $_POST['search'],
-        )));
-        quit();
+        redirect('user', 'index', array('search' => $_POST['search']));
     }
 
     $mdt = new Modele('mandate');
@@ -180,10 +177,10 @@ function user_index() {
     $where = 'WHERE user_status != "DELETE"';
 
     if (isset($_GET['search'])) {
-        $where .= ' user_name LIKE ? '
+        $where .= ' AND (user_name LIKE ? '
                 . 'OR user_lastname LIKE ? '
                 . 'OR user_firstname LIKE ? '
-                . 'OR user_email LIKE ? ';
+                . 'OR user_email LIKE ? )';
     }
 
     $pager = new SimplePager('users', $where . 'ORDER BY user_name ASC', 'p', 20);
