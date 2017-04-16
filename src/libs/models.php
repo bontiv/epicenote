@@ -583,16 +583,31 @@ class Modele {
 
         // Vérifie les noms des colones
         if (is_array($where)) {
-            foreach ($where as $colum => $value) {
+            foreach ($where as $colum => $valuesCol) {
                 if (isset($this->desc['fields'][$colum])) {
                     if ($first) {
                         $first = false;
                     } else {
-                        $sql .= ' AND';
+                        $sql .= ' AND ';
                     }
                     // TODO : Il faut utiliser LIKE pour les alphabetiques
-                    $sql .= ' `' . $colum . '` = ?';
-                    $values[] = $value;
+                    if (!is_array($valuesCol)) {
+                        $valuesCol = array($valuesCol);
+                    }
+                    $valFirst = TRUE;
+                    $sql .= ' (';
+                    foreach ($valuesCol as $value) {
+                        if ($valFirst) {
+                            $valFirst = FALSE;
+                        } else {
+                            $sql .= ' OR ';
+                        }
+                        $sql .= ' `' . $colum . '` = ?';
+                        $values[] = $value;
+                    }
+                    $sql .= ')';
+                } elseif (!is_string($colum)) {
+                    $sql .= ' AND ' . $valuesCol;
                 } else {
                     dbg_warning(__FILE__, "Colone $colum invalide dans la table " . $this->desc['name']);
                 }
