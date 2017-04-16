@@ -172,6 +172,11 @@ function user_index() {
         quit();
     }
 
+    $mdt = new Modele('mandate');
+    $mdt->find(false, 'mandate_end DESC');
+    $mdt->appendTemplate('mandates');
+
+
     $where = 'WHERE user_status != "DELETE"';
 
     if (isset($_GET['search'])) {
@@ -522,4 +527,29 @@ function user_remove_old() {
 
     $result = $pdo->exec($sql);
     redirect('user', 'index', array('hsuccess' => $result !== false));
+}
+
+function user_pdfex() {
+    if (!isset($_REQUEST['mandate'])) {
+        redirect('user', 'index', array('hsuccess' => 0));
+    }
+
+    global $srcdir, $pdo;
+
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_REQUEST['mandate']);
+
+    include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'fpdf.php';
+    include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'makefont' . DS . 'makefont.php';
+    include_once $srcdir . DS . 'libs' . DS . 'userPdfEx.php';
+
+    $users = $pdo->prepare('SELECT `users`.* FROM user_mandate LEFT JOIN users ON user_id = um_user WHERE user_status != "DELETE" AND um_mandate = ? ORDER BY user_lastname, user_firstname');
+    $users->bindValue(1, $mdt->getKey());
+    $users->execute();
+
+    $pdf = new UserPdfEx($mdt->mandate_label, $_SESSION['user']['user_name'], $users->fetchAll(PDO::FETCH_ASSOC));
+    $pdf->mktable();
+    $pdf->out();
+
+    quit();
 }

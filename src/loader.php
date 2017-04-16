@@ -31,6 +31,11 @@ $tmpdir .= DS;
 $urlbase = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/' . $urlbase;
 
 /**
+ * Définition des fonts
+ */
+define('FPDF_FONTPATH', $root . 'libs' . DS . 'font' . DS);
+
+/**
  * Chargmenet des bibliothèques nécessaire au fonctionnement
  */
 require_once $root . 'libs' . DS . 'spyc.php';
@@ -59,6 +64,7 @@ include $root . 'libs' . DS . 'Smarty' . DS . 'Smarty.class.php';
 $tpl = new Smarty();
 $tpl->compile_dir = $tmpdir;
 $tpl->template_dir = $root . 'templates';
+$tpl->force_compile = true;
 $tpl->registerPlugin('function', 'mkurl', 'mkurl_smarty');
 $tpl->registerPlugin('block', 'acl', 'acl_smarty');
 

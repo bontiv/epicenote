@@ -224,7 +224,7 @@ function index_subscriptions() {
 function index_print() {
     global $root, $srcdir, $tmpdir;
 
-    include_once $srcdir . DS . 'libs' . DS . 'fpdf.php';
+    include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'fpdf.php';
     include_once $srcdir . DS . 'libs' . DS . 'barcode.php';
 
     if (!isset($_POST['mandate']))
