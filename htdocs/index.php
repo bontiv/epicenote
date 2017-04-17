@@ -54,30 +54,6 @@ if (file_exists('bootstrap.php'))
 /*
  * Ensuite on lance le tout !
  */
+unset($page, $action);
 require_once $srcdir . DIRECTORY_SEPARATOR . 'loader.php';
-
-// Etape 2, calcul du chemin d'execution
-$action = 'index';
-if (isset($_GET['action']))
-    $action = $_GET['action'];
-$action = basename($action);
-
-$page = 'index';
-if (isset($_GET['page']))
-    $page = $_GET['page'];
-$page = basename($page);
-
-if (!file_exists($root . 'action' . DS . $action . '.php')) {
-    $action = 'syscore';
-    $page = 'nomod';
-}
-
-// Redirection si pas d'action défini
-if (!isset($_REQUEST['action']))
-    redirect('index');
-
-
-securityTime();
-securityCSRF();
-
-run();
+?>
