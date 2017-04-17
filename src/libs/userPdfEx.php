@@ -119,7 +119,7 @@ class UserPdfEx extends FPDF {
         $this->AddPage();
         $number = 1;
         foreach ($this->members as $member) {
-            if ($this->posy + 7 > 297)
+            if ($this->posy > 270)
                 $this->AddPage();
 
             $this->addptext('vdr_details', $number, 10, $this->posy, 20, 7);
