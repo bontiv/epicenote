@@ -17,6 +17,8 @@ deploy:
     script:
         - echo "Deploy intranet"
         - env
+        - cp -r * $PROJECT_SRCDIR
+        - cp -r htdocs/* $PROJECT_HTTPDIR
 #    environment:
 #        name: production
 #        url: http://intra.epitanime.com/
@@ -24,4 +26,3 @@ deploy:
 #        - master
     tags:
         - test
-#        - prod
