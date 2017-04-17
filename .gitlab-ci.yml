@@ -3,6 +3,15 @@
 stages:
     - deploy
 
+test:
+    stage: deploy
+    script:
+        - echo "Deploy intranet"
+        - env
+
+    tags:
+        - test
+
 deploy:
     stage: deploy
     script:
