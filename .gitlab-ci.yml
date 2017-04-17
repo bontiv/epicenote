@@ -3,26 +3,16 @@
 stages:
     - deploy
 
-test:
-    stage: deploy
-    script:
-        - echo "Deploy intranet"
-        - env
-
-    tags:
-        - test
-
 deploy:
     stage: deploy
     script:
-        - echo "Deploy intranet"
-        - env
+        - rm -rf $PROJECT_SRCDIR/*
         - cp -r * $PROJECT_SRCDIR
         - cp -r htdocs/* $PROJECT_HTTPDIR
-#    environment:
-#        name: production
-#        url: http://intra.epitanime.com/
-#    only:
-#        - master
+    environment:
+        name: production
+        url: http://intra.epitanime.com/
+    only:
+        - master
     tags:
-        - test
+        - prod
