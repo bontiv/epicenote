@@ -1,0 +1,27 @@
+## YAML Template.
+
+stages:
+    - deploy
+
+test:
+    stage: deploy
+    script:
+        - echo "Deploy intranet"
+        - env
+
+    tags:
+        - test
+
+deploy:
+    stage: deploy
+    script:
+        - echo "Deploy intranet"
+        - env
+#    environment:
+#        name: production
+#        url: http://intra.epitanime.com/
+#    only:
+#        - master
+    tags:
+        - test
+#        - prod
