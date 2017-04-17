@@ -103,7 +103,7 @@ class UserPdfEx extends FPDF {
         parent::__construct();
         $this->init($serie, $proprio);
         $this->members = $members;
-        $this->maxpages = ceil(count($members) / 38);
+        $this->maxpages = ceil(count($members) / 34);
         $this->SetCreator('EPITANIME', true);
         $this->SetAuthor('EPITANIME - Intranet', true);
         $this->SetTitle('EPITANIME - Membres', true);
