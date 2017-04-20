@@ -645,7 +645,6 @@ function section_trombi() {
     $usr->find(array(
         'us_section' => $mdl->section_id,
         'us_type' => 'user',
-        'user_status != "DELETE"',
     ));
     $usr->appendTemplate('users');
 
