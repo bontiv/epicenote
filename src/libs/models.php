@@ -21,6 +21,7 @@ function mdle_get_tables() {
     if ($_mdle_cache !== null)
         return $_mdle_cache;
 
+    # Defaults models
     $files = scandir($root . 'modeles');
     $tables = array();
     foreach ($files as $name) {
@@ -31,6 +32,11 @@ function mdle_get_tables() {
             if (isset($data['name']))
                 $tables[$data['name']] = $data;
         }
+    }
+
+    #Mods models
+    foreach (Extend::getInstalledMods() as $mod) {
+        $tables = array_merge_recursive($tables, $mod->getModels());
     }
 
     $_mdle_cache = $tables;
@@ -132,23 +138,34 @@ function mdle_sql_create($table) {
 function mdle_need_desc($table) {
     global $_mdle_cache, $root;
 
-    if (isset($_mdle_cache[$table]))
+    if (isset($_mdle_cache[$table])) {
         return $_mdle_cache[$table];
+    }
 
     $file = $root . 'modeles' . DS . $table . '.yml';
     if (is_file($file)) {
         $data = spyc_load_file($file);
         $data['file'] = $table . '.yml';
         if (isset($data['name']) && $data['name'] == $table) {
-            $_mdle_cache[$data['name']] = $data;
+            //$_mdle_cache[$data['name']] = $data;
             return $data;
         }
     }
+
+    #Recherche modules
+    foreach (Extend::getInstalledMods() as $mod) {
+        $tables = $mod->getModels();
+        if (isset($tables[$table])) {
+            return $tables[$table];
+        }
+    }
+
     dbg_warning(__FILE__, "Il n'y a pas de fichier portant le nom d'un modèle demandé : $table", 1);
     // Peut-être qu'en chargeant tous les fichiers on va trouver le bon...
     mdle_get_tables();
-    if (!isset($_mdle_cache[$table]))
+    if (!isset($_mdle_cache[$table])) {
         dbg_error(__FILE__, "Le modèle demandé ($table) n'existe pas", 1);
+    }
     return $_mdle_cache[$table];
 }
 
@@ -583,31 +600,16 @@ class Modele {
 
         // Vérifie les noms des colones
         if (is_array($where)) {
-            foreach ($where as $colum => $valuesCol) {
+            foreach ($where as $colum => $value) {
                 if (isset($this->desc['fields'][$colum])) {
                     if ($first) {
                         $first = false;
                     } else {
-                        $sql .= ' AND ';
+                        $sql .= ' AND';
                     }
                     // TODO : Il faut utiliser LIKE pour les alphabetiques
-                    if (!is_array($valuesCol)) {
-                        $valuesCol = array($valuesCol);
-                    }
-                    $valFirst = TRUE;
-                    $sql .= ' (';
-                    foreach ($valuesCol as $value) {
-                        if ($valFirst) {
-                            $valFirst = FALSE;
-                        } else {
-                            $sql .= ' OR ';
-                        }
-                        $sql .= ' `' . $colum . '` = ?';
-                        $values[] = $value;
-                    }
-                    $sql .= ')';
-                } elseif (!is_string($colum)) {
-                    $sql .= ' AND ' . $valuesCol;
+                    $sql .= ' `' . $colum . '` = ?';
+                    $values[] = $value;
                 } else {
                     dbg_warning(__FILE__, "Colone $colum invalide dans la table " . $this->desc['name']);
                 }
@@ -686,6 +688,11 @@ class Modele {
                 $this->instance[$name] = false;
             }
         }
+
+        if ($raw && $this->instance[$name] instanceof Modele) {
+            return $this->instance[$name]->getKey();
+        }
+
         return $this->instance[$name];
     }
 
