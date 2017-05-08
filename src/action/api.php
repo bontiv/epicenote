@@ -209,7 +209,13 @@ function api_token() {
     if ($_REQUEST['grant_type'] != 'authorization_code') {
         return _api_error('grant_type', 'Only authorization_code is supported');
     }
-
+    
+    // Récuperation client ID
+    if (isset($_SERVER['PHP_AUTH_PW'])) {
+        $_REQUEST['client_secret'] = $_SERVER['PHP_AUTH_PW'];
+    }
+    
+    
     //Recherche du client
     $cli = new Modele('api_clients');
     $cli->find(array(
@@ -334,6 +340,27 @@ function api_jwks() {
 }
 
 function _api_getUser() {
+    if (!isset($_REQUEST['access_token'])) {
+        $auth = '';
+        
+        if (isset($_SERVER['Authorization'])) {
+            $auth = $_SERVER['Authorization'];
+        }
+        
+        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $auth = $_SERVER['HTTP_AUTHORIZATION'];
+        }
+        
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            $auth = $headers['Authorization'];
+        }
+        
+        if (preg_match('/Bearer\s(\S+)/', $auth, $matches)) {
+            $_REQUEST['access_token'] = $matches[1];
+        }
+    }
+    
     $tok = new Modele('api_tokens');
     $tok->find(array(
         'at_code' => $_REQUEST['access_token'],
