@@ -70,9 +70,12 @@ function index_login() {
             }
             $tpl->display('index_login_otp.tpl');
             quit();
+        } elseif ($result === -2) { //Compte bloqué
+            $tpl->assign('msg', 'Compte verrouillé (trop de tentatives). Attendez environ 1h.');
+        } else {
+            // Et oui, pas de redirection = erreur de login ...
+            $tpl->assign('msg', 'Utilisateur ou mot de passe erroné.');
         }
-        // Et oui, pas de redirection = erreur de login ...
-        $tpl->assign('msg', 'Utilisateur ou mot de passe erroné.');
     }
 
     $_SESSION['random'] = md5(uniqid());

@@ -794,6 +794,19 @@ function login_user($user, $pass, $otp_code = null) {
     $sql = $pdo->prepare('SELECT * FROM users WHERE user_name = ?');
     $sql->bindValue(1, $user);
     $sql->execute();
+    
+    $log = $pdo->prepare('INSERT INTO logaudit (la_user, la_ip, la_date, la_type) VALUES (:user, :ip, now(), :type)');
+    $log->bindValue(':user', null);
+    $log->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
+    
+    $last = $pdo->prepare('SELECT COUNT(*) FROM logaudit WHERE la_date > now() - time("01:00:00")');
+    $last->execute();
+    
+    //Blocage si trop d'essais
+    if ($last->fetchColumn() > 2) {
+        return -2;
+    }
+    
     if ($user = $sql->fetch()) {
         //Ici l'utilisateur existe
         if (strlen($user['user_pass']) != 32) // Mot de passe non chiffré ...
@@ -806,6 +819,8 @@ function login_user($user, $pass, $otp_code = null) {
                 return -1;
             }
         }
+        
+        $log->bindValue(':user', $user['user_id']);
 
         //Mot de passe correct ?
         if (md5($user['user_pass'] . $_SESSION['random']) == $pass) {
@@ -813,9 +828,13 @@ function login_user($user, $pass, $otp_code = null) {
             $_SESSION['user']['role'] = aclFromText($user['user_role']);
             unset($_SESSION['random']);
             $_SESSION['urltok'] = substr(sha1(uniqid()), 0, 16);
+            $log->bindValue(':type', 'ACCEPT');
+            $log->execute();
             return true;
         }
     }
+    $log->bindValue(':type', 'DENY');
+    $log->execute();
     return false;
 }
 
