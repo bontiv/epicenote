@@ -35,7 +35,7 @@ function ml_index() {
 function _ml_all_members($group) {
     $api = new GoogleApi();
 
-    $members = $api->getGroupMembers($_GET['ml']);
+    $members = $api->getGroupMembers($group);
     $allMbrs = $members->members;
 
     while (property_exists($members, 'nextPageToken')) {
