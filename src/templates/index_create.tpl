@@ -23,25 +23,28 @@
     <div class="col-lg-3">
       <div class="input-group">
         <span class="input-group-addon">Pseudo</span>
-        <input class="form-control" type="text" name="user_name" />
+        <input class="form-control" type="text" name="user_name" required="" {if isset($smarty.post.user_name)}value="{$smarty.post.user_name}"{/if}/>
       </div>
       <br/>
       <div class="input-group">
         <span class="input-group-addon">Nom</span>
-        <input class="form-control" type="text" name="user_lastname" />
+        <input class="form-control" type="text" name="user_lastname" required="" {if isset($smarty.post.user_lastname)}value="{$smarty.post.user_lastname}"{/if} />
       </div>
       <br/>
       <div class="input-group">
         <span class="input-group-addon">Prénom</span>
-        <input class="form-control" type="text" name="user_firstname" />
+        <input class="form-control" type="text" name="user_firstname" required="" {if isset($smarty.post.user_firstname)}value="{$smarty.post.user_firstname}"{/if} />
       </div>
       <br/>
       <div class="input-group">
         <span class="input-group-addon">Mot de passe</span>
-        <input class="form-control" type="password" name="user_pass" />
+        <input class="form-control" type="password" required="" name="user_pass" />
       </div>
       <br/>
-      <input class="form-control" type="password" name="confirmPassword" placeholder="Confirmez le mot de passe" />
+      <div class="input-group">
+        <span class="input-group-addon">Confirmation</span>
+        <input class="form-control" type="password" name="confirmPassword" required="" placeholder="Confirmez le mot de passe" />
+      </div>
       <br/>
     </div>
 
@@ -50,24 +53,24 @@
         <span class="input-group-addon">Type</span>
         <select name="user_type" class="form-control">
           {foreach from=$types item="t"}
-              <option value="{$t.ut_id}">{$t.ut_name}</option>
+              <option value="{$t.ut_id}" {if isset($smarty.post.user_type) && $t.ut_id == $smarty.post.user_type}selected{/if}>{$t.ut_name}</option>
           {/foreach}
         </select>
       </div>
       <br/>
       <div class="input-group">
         <span class="input-group-addon">Login IONIS</span>
-        <input class="form-control" type="text" name="user_login" />
+        <input class="form-control" type="text" name="user_login" {if isset($smarty.post.user_login)}value="{$smarty.post.user_login}"{/if} />
       </div>
       <br/>
       <div class="input-group">
         <span class="input-group-addon">Email</span>
-        <input class="form-control" type="text" name="user_email" />
+        <input class="form-control" type="text" name="user_email" required="" {if isset($smarty.post.user_email)}value="{$smarty.post.user_email}"{/if} />
       </div>
       <br/>
       <div class="input-group">
         <span class="input-group-addon">Téléphone</span>
-        <input class="form-control" type="text" name="user_phone" />
+        <input class="form-control" type="text" name="user_phone" {if isset($smarty.post.user_phone)}value="{$smarty.post.user_phone}"{/if} />
       </div>
       <br/>
     </div>
