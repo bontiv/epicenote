@@ -295,16 +295,6 @@ function index_print() {
     $pdf->SetXY(18, 110);
     $pdf->Cell(50, 5, 'Promotion', 1, 0, '');
 
-    $pdf->SetXY(18, 120);
-    $pdf->Cell(50, 5, uc('Réservé aux membres prenant l\'inscription FFG (fédération française de GO)'), 0, 0, '');
-
-    $pdf->SetXY(18, 125);
-    $pdf->Cell(50, 5, uc('Nationalité'), 1, 0, '');
-    $pdf->SetXY(18, 130);
-    $pdf->Cell(50, 5, 'Niveau', 1, 0, '');
-    $pdf->SetXY(18, 135);
-    $pdf->Cell(50, 5, 'Pseudo FFG', 1, 0, '');
-
     $pdf->SetFont('Arial', '', 12);
     $pdf->SetXY(18, 222);
     $pdf->Cell(160, 5, uc('Reçu par ______________________ le ___/___/20___ , accompagné de la cotisation choisie.'), 0, 0, '');
@@ -351,12 +341,6 @@ function index_print() {
     $pdf->SetXY(68, 110);
     $pdf->Cell(130, 5, uc($usr->user_promo), 1, 0, '');
 
-    $pdf->SetXY(68, 125);
-    $pdf->Cell(130, 5, '', 1, 0, '');
-    $pdf->SetXY(68, 130);
-    $pdf->Cell(130, 5, '', 1, 0, '');
-    $pdf->SetXY(68, 135);
-    $pdf->Cell(130, 5, '', 1, 0, '');
 
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetXY(18, 145);
