@@ -11,9 +11,11 @@ function admin_modeles_index() {
 
     foreach ($tables as $t) {
         $sql = $pdo->query("SELECT COUNT(*) FROM " . $t['name']);
-        $t['nbr'] = $sql->fetch();
-        $t['nbr'] = $t['nbr'][0];
-        $tpl->append('tables', $t);
+        if ($sql) {
+            $t['nbr'] = $sql->fetch();
+            $t['nbr'] = $t['nbr'][0];
+            $tpl->append('tables', $t);
+        }
     }
     $tpl->display('adminmodeles.tpl');
     quit();
