@@ -108,7 +108,7 @@ function index_create() {
 
     if (isset($_POST['user_name']) && $_POST['user_name'] != '') {
         $pass = md5($_POST['user_name'] . ':' . $_POST['user_pass']);
-
+        
         $stm = $pdo->prepare('SELECT COUNT(*) FROM users WHERE user_name LIKE ?');
         $stm->bindValue(1, $_POST['user_name']);
         $stm->execute();
@@ -117,22 +117,27 @@ function index_create() {
         if ($securimage->check($_POST['captcha_code']) == false) {
             $tpl->assign('error', 'Le captcha est incorrect');
             $tpl->assign('error_captcha', true);
-        } elseif ($rst[0] == 0) {
-
-            if (strlen($_POST['user_pass']) < 4)
-                $tpl->assign('error', 'Mot de passes pas assez long...');
-            elseif ($_POST['user_pass'] != $_POST['confirmPassword'])
-                $tpl->assign('error', 'Mot de passes différents...');
-            elseif (autoInsert('users', 'user_', array(
+            
+        } elseif ($rst[0] != 0) {
+            //Block d'erreur utilisateur existant
+            $tpl->assign('error', "Ce nom d'utilisateur est déjà utilisé.");
+            
+        } elseif (strlen($_POST['user_pass']) < 4) {
+            $tpl->assign('error', 'Mot de passes pas assez long...');
+            
+        } elseif ($_POST['user_pass'] != $_POST['confirmPassword']) {
+            $tpl->assign('error', 'Mot de passes différents...');
+            
+        } elseif (!_index_create_testmail($_POST['user_email'])) {
+            $tpl->assign('error', "L'adresse email n'a pas pu être validée.");
+        } else {
+            if (autoInsert('users', 'user_', array(
                         'user_pass' => $pass,
                         'user_role' => 'GUEST',
                     ))) {
                 $tpl->assign('succes', true);
             } else
                 $tpl->assign('error', 'Erreur SQL...');
-        } else {
-            //Block d'erreur utilisateur existant
-            $tpl->assign('error', "Ce nom d'utilisateur est déjà utilisé.");
         }
     } elseif (isset($_POST['user_name'])) {
         $tpl->assign('error', "Le nom d'utilisateur ne peut pas être vide.");
@@ -147,6 +152,67 @@ function index_create() {
 
     $tpl->display('index_create.tpl');
     quit();
+}
+
+/**
+ * Send welcome email
+ * @param type $email
+ * @param type $pseudo
+ */
+function _index_create_mail($email, $pseudo) {
+    global $tpl;
+    
+    var_dump($tpl->getTemplateDir());
+    
+    $mail = getMailer();
+    $mail->IsHTML(true);
+    $mail->AddAddress($email, $pseudo);
+    $mail->AddReplyTo('bureau@epitanime.com', 'Bureau EPITANIME');
+    $mail->SetLanguage('fr');
+    $mail->Subject = "[EPITANIME] Bienvenue";
+    $mail->Body = $tpl->fetch('index_mail_welcome.tpl');
+    
+    return $mail->send();
+}
+
+function _index_create_testmail($email) {
+    global $srcdir;
+    
+    require_once $srcdir . '/libs/phpmailer/class.smtp.php';
+    
+    $m = getMailer();
+    $smtp = new SMTP();
+    $addr = filter_var($email, FILTER_VALIDATE_EMAIL);
+    
+    if ($addr === false) {
+        return false;
+    }
+    
+    $d = substr($email, strrpos($addr, '@') + 1);
+    $smtp->Timeout = 5;
+    $smtp->Timelimit = 5;
+            
+    if (!getmxrr($d, $mxhosts)) {
+        return false;
+    }
+    
+    elseif (!$smtp->Connect($mxhosts[0], 25, 5)) {
+        return false;
+    }
+    
+    elseif (!$smtp->Hello('intra.epitanime.com')) {
+        return false;
+    }
+    
+    elseif (!$smtp->Mail($m->Sender)) {
+        return false;
+    }
+    
+    elseif (!$smtp->Recipient($addr)) {
+        return false;
+    }
+    $smtp->Reset();
+    return true;
 }
 
 /**
