@@ -799,7 +799,9 @@ function login_user($user, $pass, $otp_code = null) {
     $log->bindValue(':user', null);
     $log->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
     
-    $last = $pdo->prepare('SELECT COUNT(*) FROM logaudit WHERE la_date > now() - time("01:00:00")');
+    $last = $pdo->prepare('SELECT COUNT(*) FROM logaudit WHERE la_date > now() - time("01:00:00") AND la_type = \'ACCEPT\' AND (la_user = :user OR la_ip = :ip)');
+    $last->bindValue(':user', $user);
+    $last->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
     $last->execute();
     
     //Blocage si trop d'essais

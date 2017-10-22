@@ -1,0 +1,29 @@
+## Table logaudit
+name: logaudit
+key: la_id
+fields:
+    la_id:
+        type: auto_int
+
+    la_user:
+        type: external
+        table: users
+        display: %user_name%
+        label: Utilisateur
+        null: yes
+        
+    la_ip:
+        type: var
+        size: 128
+        label: IP
+        
+    la_date:
+        type: date_time
+        label: Date d'audit
+        
+    la_type:
+        type: enum
+        label: Type d'audit
+        items:
+            ACCEPT: Accès authorisé
+            DENY: Accès refusé
