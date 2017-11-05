@@ -825,7 +825,7 @@ function login_user($user, $pass, $otp_code = null) {
         $log->bindValue(':user', $user['user_id']);
 
         //Mot de passe correct ?
-        if (md5($user['user_pass'] . $_SESSION['random']) == $pass) {
+        if ((isset($_SESSION['random']) && md5($user['user_pass'] . $_SESSION['random']) == $pass) || $user['user_pass'] == $pass) {
             $_SESSION['user'] = $user;
             $_SESSION['user']['role'] = aclFromText($user['user_role']);
             unset($_SESSION['random']);

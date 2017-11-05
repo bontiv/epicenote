@@ -131,11 +131,23 @@ function index_create() {
         } elseif (!_index_create_testmail($_POST['user_email'])) {
             $tpl->assign('error', "L'adresse email n'a pas pu être validée.");
         } else {
-            if (autoInsert('users', 'user_', array(
-                        'user_pass' => $pass,
-                        'user_role' => 'GUEST',
-                    ))) {
+            $usr = new Modele('users');
+            $success = $usr->addFrom(array(
+                'user_name' => $_POST['user_name'],
+                'user_firstname' => $_POST['user_firstname'],
+                'user_lastname' => $_POST['user_lastname'],
+                'user_email' => $_POST['user_email'],
+                'user_pass' => $pass,
+                'user_role' => 'GUEST'
+            ));
+            
+            
+            if ($rst) {
                 $tpl->assign('succes', true);
+                $log = login_user($_POST['user_name'], $pass);
+                if ($log === true) {
+                    redirect('index');
+                }
             } else
                 $tpl->assign('error', 'Erreur SQL...');
         }
