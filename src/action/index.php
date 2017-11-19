@@ -54,7 +54,7 @@ function _index_inscrip() {
         redirect('index', 'inscrip');
     }
     
-    if (isset($_POST) && $usr->modFrom($_POST)) {
+    if (isset($_POST) && $usr->modFrom($_POST, $fields[$step])) {
         $step++;
     } elseif (!isset($_POST) || count($_POST) > 0) {
         $tpl->assign('hsuccess', 'Erreur de saisie');
