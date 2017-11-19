@@ -72,7 +72,9 @@ fields:
     label: Niveau d'acréditation
     items:
       GUEST: Nouvel inscrit
-      USER: Utilisateur validé
+      CPLUSER: Profil complet
+      USER: Utilisateur
+      ADVUSER: (Réservé) Utilisateur 
       SUPERUSER: Utilisateur acrédité
       ADMINISTRATOR: Administrateur
 

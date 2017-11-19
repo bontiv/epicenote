@@ -7,6 +7,78 @@
  * par le framework.
  * @package Epicenote
  */
+function _index_inscrip() {
+    global $tpl;
+
+    $step = isset($_GET['step']) ? $_GET['step'] : 0;
+    $usr = new Modele('users');
+    $usr->fetch($_SESSION['user']['user_id']);
+
+    $titles = array(
+        'Informations civiques',
+        'Coordonnées',
+        'Campus IONIS',
+        'Promotion',
+        'Inscription',
+        null
+    );
+
+    $fields = array(
+        array(
+            'user_firstname',
+            'user_lastname',
+            'user_sexe',
+            'user_born',
+        ),
+        array(
+            'user_address',
+            'user_cp',
+            'user_town',
+            'user_email',
+            'user_phone',
+        ),
+        array(
+            'user_type',
+        ),
+        array(
+            'user_promo',
+            'user_login',
+        ),
+        array(
+        ),
+        array(
+        ),
+    );
+    
+    if ($step == 4) {
+        redirect('index', 'inscrip');
+    }
+    
+    if (isset($_POST) && $usr->modFrom($_POST)) {
+        $step++;
+    } elseif (!isset($_POST) || count($_POST) > 0) {
+        $tpl->assign('hsuccess', 'Erreur de saisie');
+    }
+    
+    if ($step == 3 && $usr->user_type->ut_name == "EXTERNE") {
+        $step++;
+    }
+
+    if ($step == 4) {
+        $tpl->assign('inscrip', '<p>Votre inscription sur l\'intranet est finalisée !</p><p>Cliquez sur <b>Suivant</b> pour être redirigé sur la page d\'édition de la fiche de membre pour rejoindre l\'association ou <b>Fermer</b> si vous ne souhaitez pas vous inscrire.</p>');
+        if (!hasAcl(ACL_CPLUSER)) {
+            $usr->user_role = 'CPLUSER';
+            $_SESSION['user']['role'] = ACL_CPLUSER;
+            $_SESSION['user']['user_role'] = 'CPLUSER';
+        }
+    } else {
+        $tpl->assign('inscrip', $usr->edit($fields[$step]));
+    }
+
+
+    $tpl->assign('inscrip_title', $titles[$step]);
+    $tpl->assign('inscrip_step', $step);
+}
 
 /**
  * Petite page de présentation du projet
@@ -31,6 +103,10 @@ function index_index() {
     $nbSQL->execute();
     $nbFtp = $nbSQL->fetch();
     $tpl->assign('nbFtp', $nbFtp[0]);
+
+    if (hasAcl(ACL_GUEST) && $_SESSION['user']['user_role'] == 'GUEST' || isset($_GET['step']) && $_GET['step'] <= 4) {
+        _index_inscrip();
+    }
 
     $tpl->assign('isMember', hasAcl(ACL_USER));
     $tpl->display('index.tpl');
@@ -108,7 +184,7 @@ function index_create() {
 
     if (isset($_POST['user_name']) && $_POST['user_name'] != '') {
         $pass = md5($_POST['user_name'] . ':' . $_POST['user_pass']);
-        
+
         $stm = $pdo->prepare('SELECT COUNT(*) FROM users WHERE user_name LIKE ?');
         $stm->bindValue(1, $_POST['user_name']);
         $stm->execute();
@@ -117,17 +193,13 @@ function index_create() {
         if ($securimage->check($_POST['captcha_code']) == false) {
             $tpl->assign('error', 'Le captcha est incorrect');
             $tpl->assign('error_captcha', true);
-            
         } elseif ($rst[0] != 0) {
             //Block d'erreur utilisateur existant
             $tpl->assign('error', "Ce nom d'utilisateur est déjà utilisé.");
-            
         } elseif (strlen($_POST['user_pass']) < 4) {
             $tpl->assign('error', 'Mot de passes pas assez long...');
-            
         } elseif ($_POST['user_pass'] != $_POST['confirmPassword']) {
             $tpl->assign('error', 'Mot de passes différents...');
-            
         } elseif (!_index_create_testmail($_POST['user_email'])) {
             $tpl->assign('error', "L'adresse email n'a pas pu être validée.");
         } else {
@@ -140,8 +212,8 @@ function index_create() {
                 'user_pass' => $pass,
                 'user_role' => 'GUEST'
             ));
-            
-            
+
+
             if ($rst) {
                 $tpl->assign('succes', true);
                 $log = login_user($_POST['user_name'], $pass);
@@ -173,9 +245,9 @@ function index_create() {
  */
 function _index_create_mail($email, $pseudo) {
     global $tpl;
-    
+
     var_dump($tpl->getTemplateDir());
-    
+
     $mail = getMailer();
     $mail->IsHTML(true);
     $mail->AddAddress($email, $pseudo);
@@ -183,48 +255,44 @@ function _index_create_mail($email, $pseudo) {
     $mail->SetLanguage('fr');
     $mail->Subject = "[EPITANIME] Bienvenue";
     $mail->Body = $tpl->fetch('index_mail_welcome.tpl');
-    
+
     return $mail->send();
 }
 
 function _index_create_testmail($email) {
     global $srcdir;
-    
+
     require_once $srcdir . '/libs/phpmailer/class.smtp.php';
-    
+
     $m = getMailer();
     $smtp = new SMTP();
     $addr = filter_var($email, FILTER_VALIDATE_EMAIL);
-    
+
     if ($addr === false) {
         return false;
     }
-    
+
     $d = substr($email, strrpos($addr, '@') + 1);
     $smtp->Timeout = 5;
     $smtp->Timelimit = 5;
-            
+
     if (!getmxrr($d, $mxhosts)) {
         return false;
-    }
-    
-    elseif (!$smtp->Connect($mxhosts[0], 25, 5)) {
+    } elseif (!$smtp->Connect($mxhosts[0], 25, 5)) {
         return false;
-    }
-    
-    elseif (!$smtp->Hello('intra.epitanime.com')) {
+    } elseif (!$smtp->Hello('intra.epitanime.com')) {
         return false;
-    }
-    
-    elseif (!$smtp->Mail($m->Sender)) {
+    } elseif (!$smtp->Mail($m->Sender)) {
         return false;
-    }
-    
-    elseif (!$smtp->Recipient($addr)) {
+    } elseif (!$smtp->Recipient($addr)) {
         return false;
     }
     $smtp->Reset();
     return true;
+}
+
+function index_inscrip() {
+    modexec('index', 'profile');
 }
 
 /**
