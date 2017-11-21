@@ -214,7 +214,7 @@ function index_create() {
             ));
 
 
-            if ($rst) {
+            if ($success) {
                 $tpl->assign('succes', true);
                 $log = login_user($_POST['user_name'], $pass);
                 if ($log === true) {
