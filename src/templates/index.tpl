@@ -7,34 +7,36 @@
 
 <br />
 
-<form method="POST" action="{mkurl action="index" page="index" step=$inscrip_step}" class="form-horizontal">
-    <div class="modal fade" id="inscrip" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">{$inscrip_title}</h4>
-                </div>
-                <div class="modal-body">
-                    <fieldset>
-                        {$inscrip}
-                    </fieldset>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">Suivant</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-</form>
-{if isset($smarty.session.user) and $smarty.session.user.user_role == "GUEST" or isset($inscrip_step) and $inscrip_step < 5}
+{if isset($inscrip_step)}
+    <form method="POST" action="{mkurl action="index" page="index" step=$inscrip_step}" class="form-horizontal">
+        <div class="modal fade" id="inscrip" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">{$inscrip_title}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <fieldset>
+                            {$inscrip}
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-primary">Suivant</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </form>
+{/if}
 
+{if isset($smarty.session.user) and $smarty.session.user.user_role == "GUEST" or isset($inscrip_step) and $inscrip_step < 5}
     <script type="text/javascript">
         {literal}
-                        $(function () {
-                            $('#inscrip').modal('show');
-                        });
+            $(function () {
+                $('#inscrip').modal('show');
+            });
         {/literal}
     </script>
 {/if}
