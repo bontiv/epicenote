@@ -92,6 +92,23 @@ function admin_note_delmandate() {
     }
 }
 
+function admin_note_modmandate() {
+    global $tpl;
+    
+    $mdl = new Modele('mandate');
+    $mdl->fetch($_REQUEST['mandate']);
+
+    if (isset($_POST['mandate_label'])) {
+        if ($mdl->modFrom($_POST)) {
+            redirect('admin_note', 'mandate', array('hsuccess' => 1));
+        } else {
+            $tpl->assign('hsuccess', false);
+        }
+    }
+        $mdl->assignTemplate('mandate');
+        display();
+}
+
 function admin_note_periods() {
     $mdl = new Modele('periods');
     $mdl->find(array("period_state" => "ACTIVE"));
