@@ -108,14 +108,16 @@ if (isset($_GET['etape']) && $_GET['etape'] == 'dbsync') {
         $sql = $pdo->query("SHOW COLUMNS FROM $table");
         $fields = array();
         $modify_fields = array();
+        $del_fields = array();
         while ($c = $sql->fetch()) {
             $fields[] = $c['Field'];
-            if ($c['Type'] != mdle_field_type($define_tables[$table], $c['Field']))
+            if (!isset($define_tables[$table]['fields'][$c['Field']]))
+                $del_fields[] = $c['Field'];
+            elseif ($c['Type'] != mdle_field_type($define_tables[$table], $c['Field']))
                 $modify_fields[] = $c['Field'];
             elseif (isset($define_tables[$table]['fields'][$c['Field']]['null']) && $c['Null'] != 'YES')
                 $modify_fields[] = $c['Field'];
         }
-        $del_fields = array_diff($fields, array_keys($define_tables[$table]['fields']));
         $add_fields = array_diff(array_keys($define_tables[$table]['fields']), $fields);
         if (count($add_fields) + count($del_fields) + count($modify_fields) != 0) {
             $modify_tables[] = array(
