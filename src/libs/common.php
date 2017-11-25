@@ -98,7 +98,7 @@ $menu['DEFAULT'] = array(
                 'url' => 'ecole',
             ),
             'MARKING' => array(
-                'label' => 'Notation',
+                'label' => 'Mandats & Notations',
                 'url' => 'admin_note',
             ),
             'MAILLING' => array(
