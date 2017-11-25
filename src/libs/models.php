@@ -393,6 +393,7 @@ class Modele {
     private $desc;
     private $instance;
     private $iterator;
+    private $fields;
 
     function __construct($table, $id = null) {
 
@@ -400,10 +401,12 @@ class Modele {
         if ($table instanceof Modele) {
             $id = $table->getKey();
             $table = $table->getName();
+//            $this->fields = $table->getFields();
         }
 
         $this->desc = mdle_need_desc($table);
         $this->iterator = false;
+        $this->fields = null;
         foreach ($this->desc['fields'] as $n => &$v) {
             $v['name'] = $n;
             if (!isset($v['label']))
@@ -416,7 +419,16 @@ class Modele {
             }
         }
     }
+    
+    public function setFields($fields) {
+        $this->fields = $fields;
+        return $this;
+    }
 
+    public function getFields() {
+        return $this->fields;
+    }
+    
     private function hasRight($field) {
         if (!hasAcl(ACL_ADMINISTRATOR) && isset($this->desc['fields'][$field]['readonly']) && $this->desc['fields'][$field]['readonly'] == 'true')
             return false;
@@ -463,15 +475,31 @@ class Modele {
 
     function edit($fieldlist = null) {
         $form = '';
+        if ($fieldlist === null) {
+            $fieldlist = $this->fields;
+        }
+        
         foreach (array_keys($this->desc['fields']) as $name)
             if ($this->hasRight($name) && ($fieldlist === null || in_array($name, $fieldlist)))
                 $form .= $this->displayField($name);
         return $form;
     }
 
-    function addFrom($data) {
+    function addFrom($data, $secure = null) {
         global $pdo;
 
+        if ($secure === null) {
+            $secure = $this->fields;
+        }
+        
+        if (is_array($secure)) {
+            foreach ($data as $key => $val) {
+                if (!in_array($key, $secure)) {
+                    unset($data[$key]);
+                }
+            }
+        }
+        
         $sql = 'INSERT INTO ' . $this->desc['name'] . ' (';
         $nbVals = 0;
         $values = array();
