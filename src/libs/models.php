@@ -76,8 +76,7 @@ function mdle_field_type($table_info, $field) {
     if ($field['type'] == 'bool')
         return 'enum(\'true\', \'false\')';
 
-    echo '<br><br><strong>Type field inconnu</strong><br>';
-    var_dump($field, $table_info['name']);
+    dbg_error(__FILE__, 'Type field inconnu');
     exit();
 }
 
