@@ -87,6 +87,7 @@ if (isset($_GET['etape']) && $_GET['etape'] == 'dbsync') {
     $root = $srcdir . DS;
     require_once $root . 'libs' . DS . 'spyc.php';
     require_once $root . 'libs' . DS . 'common.php';
+    require_once $root . 'libs' . DS . 'extend.php';
     require_once $root . 'libs' . DS . 'models.php';
     $pdo = new PDO($dsn, $db_user, $db_pass);
 
