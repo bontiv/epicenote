@@ -301,30 +301,10 @@ function section_addpoints() {
         while ($user = $sql->fetch()) {
             if (in_array($user['user_id'], $_POST['staffs'])) {
                 $dataMark['mark_user'] = $user['user_id'];
-                $dataMark['mark_period'] = $_POST['type-' . $user['user_type']];
                 $mdlMark->addFrom($dataMark);
             }
         }
         redirect('section', 'details', array('section' => $section->section_id, 'hsuccess' => '1'));
-    }
-
-    $types = new Modele('user_types');
-    $types->find();
-    while ($type = $types->next()) {
-        $periods = $pdo->prepare('SELECT * FROM periods WHERE period_start < NOW() AND period_end > NOW() AND period_type = ? AND period_state = "ACTIVE"');
-        $periods->bindValue(1, $types->ut_id);
-        $periods->execute();
-
-        $repPeriods = array();
-        while ($period = $periods->fetch()) {
-            $repPeriods[] = $period;
-        }
-
-        $tpl->append('types', array(
-            'id' => $types->ut_id,
-            'name' => $types->ut_name,
-            'periods' => $repPeriods,
-        ));
     }
 
     $sql = $pdo->prepare('SELECT * FROM user_sections LEFT JOIN users ON user_id = us_user WHERE us_section = ? ORDER BY user_name');

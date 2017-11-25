@@ -18,23 +18,6 @@
   </fieldset>
 
   <fieldset>
-    <legend>Groupes et périodes de notation</legend>
-
-    {foreach from=$types item="type"}
-        <div class="form-group">
-          <label class="col-md-4 control-label" for="type-{$type.id}">{$type.name}</label>
-          <div class="col-md-4">
-            <select id="type-{$type.id}" name="type-{$type.id}" class="form-control">
-              {foreach from=$type.periods item="period"}
-                  <option value="{$period.period_id}">{$period.period_label}</option>
-              {/foreach}
-            </select>
-          </div>
-        </div>
-    {/foreach}
-  </fieldset>
-
-  <fieldset>
     <legend>Attributions</legend>
 
     <!-- Multiple Checkboxes -->
