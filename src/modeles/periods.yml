@@ -14,16 +14,12 @@ fields:
   period_end:
     type: date
     label: fin
+    null: true
   period_type:
     type: external
     table: user_types
     display: %ut_name%
     label: Ecole / Type
-  period_mandate:
-    type: external
-    table: mandate
-    display: %mandate_label%
-    label: Mandat
   period_generator:
       label: Générateur du bulletin
       type: var
