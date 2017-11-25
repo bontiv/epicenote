@@ -37,9 +37,6 @@ fields:
           SENT:   Bulletin envoyé
 
 indexes:
-  idx_period_mandate:
-    type: index
-    fields: [period_mandate]
   idx_period_type:
     type: index
     fields: [period_type]
