@@ -169,9 +169,12 @@ function index_profile() {
     }
 
     $mdt = new Modele('mandate');
-    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now()', 'mandate_end DESC')) {
-        while ($line = $mdt->next()) {
-            $tpl->append('mandate', $line);
+    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now() and mandate_state = "ACTIVE"', 'mandate_ago DESC')) {
+        if ($mdt->next()) {
+            $mdt->assignTemplate('mandate');
+            $sub = new Modele('subscription');
+            $sub->find(array('subscription_mandate' => $mdt->getKey()));
+            $sub->appendTemplate('subs');
         }
     }
 
@@ -210,37 +213,31 @@ function index_profile() {
     display();
 }
 
-function index_subscriptions() {
-    $sub = new Modele('subscription');
-    if ($sub->find()) {
-        //if ($sub->find(array('subscription_mandate' => $_GET['mandate']))) {
-        while ($line = $sub->next()) {
-            echo '<option value="' . $line['subscription_id'] . '">' . $line['subscription_label'] . ' (montant ' . $line['subscription_price'] . ' €)</option>';
-        }
-    }
-    quit();
-}
-
 function index_print() {
     global $root, $srcdir, $tmpdir;
 
     include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'fpdf.php';
     include_once $srcdir . DS . 'libs' . DS . 'barcode.php';
 
-    if (!isset($_POST['mandate']))
-        $_POST['mandate'] = 1;
     if (!isset($_POST['subscription']))
         $_POST['subscription'] = 1;
 
     $mdt = new Modele('mandate');
-    $mdt->fetch($_POST['mandate']);
+    if (!$mdt->find('`mandate_start` < now() and `mandate_end` > now() and mandate_state = "ACTIVE"', 'mandate_ago DESC')) {
+        dbg_error(__FILE__, 'Erreur SQL sur mandat');
+    }
+    if (!$mdt->next()) {
+        dbg_error(__FILE__, 'Mandat non actif');
+    }
     $sub = new Modele('subscription');
     $sub->fetch($_POST['subscription']);
     $usr = new Modele('users');
     $usr->fetch($_SESSION['user']['user_id']);
     $sublist = new Modele('subscription');
     //$sublist->find(array('subscription_mandate' => $mdt->mandate_id));
-    $sublist->find();
+    $sublist->find(array(
+        'subscription_mandate' => $mdt->getKey(),
+    ));
 
     if (new DateTime($mdt->mandate_start) > new DateTime() || new DateTime($mdt->mandate_end) < new DateTime()) {
         modexec('syscore', 'moderror');

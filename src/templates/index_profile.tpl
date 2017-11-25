@@ -13,19 +13,6 @@
           return true
   {rdelim}
 
-      function updateSub() {ldelim}
-              jQuery.ajax({ldelim}
-                          url: "{mkurl action="index" page="subscriptions"}&mandate=" + $('#mandate').val(),
-                          dataType: 'html',
-                          success: function (data){ldelim}
-                                          $('#subscription').html(data)
-  {rdelim}
-  {rdelim})
-  {rdelim}
-
-      $(function (){ldelim}
-              updateSub()
-  {rdelim})
 </script>
 
 
@@ -256,11 +243,7 @@
           <div class="form-group">
             <label class="col-md-4 control-label" for="mandate">Mandat</label>
             <div class="col-md-5">
-              <select id="mandate" name="mandate" class="form-control input-md" onchange="updateSub()">
-                {foreach from=$mandate item="l"}
-                    <option value="{$l.mandate_id}">{$l.mandate_label}</option>
-                {/foreach}
-              </select>
+                <p class="form-control-static">{$mandate->mandate_label}</p>
             </div>
           </div>
 
@@ -269,6 +252,9 @@
             <label class="col-md-4 control-label" for="subscription">Type de cotisation</label>
             <div class="col-md-5">
               <select id="subscription" name="subscription" class="form-control input-md">
+                  {foreach $subs as $sub}
+                      <option value="{$sub->getKey()}">{$sub->subscription_label}</option>
+                      {/foreach}
               </select>
             </div>
           </div>
