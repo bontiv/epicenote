@@ -144,7 +144,7 @@ if (isset($_GET['etape']) && $_GET['etape'] == 'dbsync') {
                 $first = false;
             else
                 $sql .= ',';
-            $sql .= "\n    DEL `$col`";
+            $sql .= "\n    DROP COLUMN `$col`";
         }
         foreach ($tdef['add'] as $col) {
             if ($first)
@@ -167,9 +167,12 @@ if (isset($_GET['etape']) && $_GET['etape'] == 'dbsync') {
 
     if (isset($_POST['installed'])) {
         $pdo->beginTransaction();
-        foreach ($sql_queries as $sql)
-            if ($pdo->exec($sql) === false)
+        foreach ($sql_queries as $sql) {
+            if ($pdo->exec($sql) === false) {
                 $valid[] = false;
+                var_dump($pdo->errorInfo());
+            }
+        }
 
         // Ajout du compte admin
         $sql = $pdo->prepare('SELECT * FROM users WHERE user_name = ?');
