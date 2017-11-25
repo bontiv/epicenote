@@ -246,8 +246,6 @@ function index_create() {
 function _index_create_mail($email, $pseudo) {
     global $tpl;
 
-    var_dump($tpl->getTemplateDir());
-
     $mail = getMailer();
     $mail->IsHTML(true);
     $mail->AddAddress($email, $pseudo);
@@ -260,9 +258,13 @@ function _index_create_mail($email, $pseudo) {
 }
 
 function _index_create_testmail($email) {
-    global $srcdir;
+    global $srcdir, $config;
 
     require_once $srcdir . '/libs/phpmailer/class.smtp.php';
+    
+    if ($config['PHPMailer']['enable'] == 'no') {
+        return true;
+    }
 
     $m = getMailer();
     $smtp = new SMTP();
