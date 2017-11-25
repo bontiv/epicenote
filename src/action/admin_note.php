@@ -214,3 +214,56 @@ function admin_note_downbulletin() {
     bulletin_download($_GET['id']);
     quit();
 }
+
+function admin_note_cotis() {
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+    
+    $cotis = new Modele('subscription');
+    $cotis->find(array(
+        'subscription_mandate' => $mdt->getKey(),
+    ));
+    
+    $cotis->appendTemplate('cotis');
+    $mdt->assignTemplate('mandate');
+    display();
+}
+
+function admin_note_addcotis() {
+    global $tpl;
+    
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+    $cotis = new Modele('subscription');
+    $cotis->setFields(array(
+        'subscription_label',
+        'subscription_price'
+    ));
+    
+    if (isset($_POST['subscription_label'])) {
+        $data = array(
+            'subscription_label' => $_POST['subscription_label'],
+            'subscription_price' => $_POST['subscription_price'],
+            'subscription_mandate' => $mdt->getKey(),
+        );
+        if ($cotis->addFrom($data, true)) {
+            redirect('admin_note', 'cotis', array('hsuccess' => 1, 'mandate' => $mdt->getKey()));
+        } else {
+            $tpl->assign('hsuccess', false);
+        }
+    }
+
+    $cotis->assignTemplate('cotis');
+    
+    $mdt->assignTemplate('mandate');
+    display();    
+}
+
+function admin_note_delcotis() {
+    $cot = new Modele('subscription');
+    $cot->fetch($_GET['cotis']);
+    
+    $mdl = $cot->raw_subscription_mandate;
+    $cot->delete();
+    redirect('admin_note', 'cotis', array('mandate' => $mdl, 'hsuccess' => 1));
+}
