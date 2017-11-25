@@ -84,7 +84,7 @@
                             <input id="captcha_code" name="captcha_code" placeholder="Texte de l'image" class="form-control input-md" required="" type="text">
                         </div>
 
-                        <input type="submit" value="Créeer le compte" class="btn btn-info btn-block">
+                        <input type="submit" value="Créer le compte" class="btn btn-info btn-block">
 
                     </div>
                 </div>
