@@ -75,7 +75,7 @@
                             {if $nbEvents eq 0}
                                 <p>Il n'y a aucun événement à venir.</p>
                             {else}
-                                <p>Il n'y a {$nbEvents} événement{if $nbEvents gt 1}s{/if} à venir.</p>
+                                <p>Il y a {$nbEvents} événement{if $nbEvents gt 1}s{/if} à venir.</p>
                             {/if}
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                         </div>
                         <div class="panel-body">
                             <p>
-                                Vous n'avez pas vérifié votre profil.{$smarty.session.user.user_role}
+                                Vous n'avez pas vérifié votre profil.
                             </p>
                             <button class="btn btn-default" data-toggle="modal" data-target="#inscrip">Ouvrir l'assistant</button>
                         </div>
