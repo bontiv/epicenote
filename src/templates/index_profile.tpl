@@ -235,7 +235,9 @@
       de l'association.
     </p>
 
-    {if isset($mandate)}
+    {if not $completed}
+        <div class="alert alert-danger">Vous devez compléter votre profil avant de vous inscrire ! <a href="{mkurl page=index action=index}">Page d'accueil</a></div>
+    {elseif isset($mandate)}
         <form target="_blank" class="form-horizontal" action="{mkurl action="index" page="print"}" method="POST">
 
           <!-- List mandate -->

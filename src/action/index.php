@@ -340,6 +340,7 @@ function index_profile() {
     $tpl->assign('random', $_SESSION['random']);
     $tpl->assign('isMember', hasAcl(ACL_USER));
     $tpl->assign('form', $mdl->edit());
+    $tpl->assign('completed', hasAcl(ACL_CPLUSER));
 
     $mdl = new Modele('card');
     $mdl->find(array('card_user' => $_SESSION['user']['user_id']));
