@@ -4,11 +4,14 @@
   <li role="presentation"{if $smarty.get.page=="index"} class="active"{/if}>
     <a href="{mkurl action="admin_note" page="index"}">A valider</a>
   </li>
+  <li role="presentation"{if $smarty.get.page=="list"} class="active"{/if}>
+    <a href="{mkurl action="admin_note" page="list"}">Notes</a>
+  </li>
   <li role="presentation"{if $smarty.get.page=="mandate"} class="active"{/if}>
     <a href="{mkurl action="admin_note" page="mandate"}">Mandats</a>
   </li>
   <li role="presentation"{if $smarty.get.page=="periods"} class="active"{/if}>
-    <a href="{mkurl action="admin_note" page="periods"}">Périodes actives</a>
+    <a href="{mkurl action="admin_note" page="periods"}">Semestres</a>
   </li>
   <li role="presentation"{if $smarty.get.page=="bulletin"} class="active"{/if}>
     <a href="{mkurl action="admin_note" page="bulletin"}">Bulletins</a>

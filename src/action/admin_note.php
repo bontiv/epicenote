@@ -69,12 +69,34 @@ function admin_note_mandate() {
 }
 
 function admin_note_addmandate() {
-    global $tpl;
+    global $tpl, $pdo;
 
     $mdl = new Modele('mandate');
+    $mdl->setFields(array(
+        'mandate_label',
+        'mandate_ago',
+    ));
+    
     $mdl->assignTemplate('mandat');
     if (isset($_POST['edit'])) {
-        if ($mdl->addFrom($_POST)) {
+        $enddate = new DateTime($_POST['mandate_ago']);
+        $enddate->add(new DateInterval("P1Y"));
+        $enddate->sub(new DateInterval("P14D"));
+        $data = array(
+            'mandate_label' => $_POST['mandate_label'],
+            'mandate_ago' => $_POST['mandate_ago'],
+            'mandate_end' => $enddate->format('Y-m-d'),
+        );
+        
+        if ($mdl->addFrom($data, true)) {
+            //End other mandates
+            $endlast = new DateTime($_POST['mandate_ago']);
+            $endlast->add(new DateInterval('P1M'));
+            
+            $upd = $pdo->prepare('UPDATE mandate SET mandate_end = ?, mandate_state = "DISABLED" WHERE mandate_end > now() AND mandate_id != ?');
+            $upd->bindValue(1, $endlast->format('Y-m-d'));
+            $upd->bindValue(2, $mdl->getKey());
+            $upd->execute();
             redirect("admin_note", "mandate", array('hsuccess' => 1));
         }
         $tpl->assign('hsuccess', false);
@@ -266,4 +288,24 @@ function admin_note_delcotis() {
     $mdl = $cot->raw_subscription_mandate;
     $cot->delete();
     redirect('admin_note', 'cotis', array('mandate' => $mdl, 'hsuccess' => 1));
+}
+
+function admin_note_disable_mandate () {
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+    
+    $mdt->mandate_state = 'DISABLED';
+    redirect('admin_note', 'mandate', array('hsuccess' => 1));
+}
+
+function admin_note_active_mandate () {
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+
+    if ($mdt->raw_mandate_state == 'DRAFT') {
+        $mdt->mandate_start = date('Y-m-d');
+    }
+    
+    $mdt->mandate_state = 'ACTIVE';
+    redirect('admin_note', 'mandate', array('hsuccess' => 1));
 }

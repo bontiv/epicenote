@@ -542,12 +542,18 @@ class Modele {
         return $rst;
     }
 
-    function modFrom($data, $secure = true) {
+    function modFrom($data, $secure = null) {
         global $pdo;
 
         $sql = 'UPDATE ' . $this->desc['name'] . ' SET ';
         $nbVals = 0;
         $values = array();
+        
+        if ($secure === null && $this->fields !== null) {
+            $secure = $this->fields;
+        } elseif ($secure === null) {
+            $secure = true;
+        }
         
         // Sécurisation de la modification par liste de champs
         if (is_array($secure)) {
