@@ -6,3 +6,4 @@
 .DS_Store
 /src/libs/card_bg.*
 /tmp/*.cache
+/PHPDocFill.html

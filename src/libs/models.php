@@ -548,6 +548,12 @@ class Modele {
         $sql = 'UPDATE ' . $this->desc['name'] . ' SET ';
         $nbVals = 0;
         $values = array();
+        
+        // Sécurisation de la modification par liste de champs
+        if (is_array($secure)) {
+            $data = array_intersect_key($data, array_flip($secure));
+            $secure = true;
+        }
 
         foreach ($this->desc['fields'] as $name => $desc) {
             if ($desc['type'] == 'auto_int')

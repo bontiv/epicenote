@@ -2,93 +2,95 @@
 
 {if $succes}
     <div class="alert success alert-success" role="alert">
-      Inscription passé avec succès. Vous pouvez dès à présent vous connecter.
+        Inscription passé avec succès. Vous pouvez dès à présent vous connecter.
     </div>
 {/if}
 {if $error}
     <div class="alert alert-danger danger" role="alert"><strong>Erreur !</strong> {$error}</div>
 {/if}
 
+{literal}
+    <style type="text/css">
+        .centered-form{
+            margin-top: 60px;
+        }
 
-<h1>Inscription</h1>
-<div class="alert alert-info">
-  <p><strong>Attention !</strong> L'inscription sur ce site ne tient pas lieu
-    d'inscription à l'association. Vous devez vous inscrire et cotiser en
-    tant qu'adhérent pour bénéficier de tous les services de ce site.
-  </p>
-</div>
+        .centered-form .panel{
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: rgba(0, 0, 0, 0.3) 20px 20px 20px;
+        }
+    </style>
+{/literal}
 
-<div class="container col-lg-12">
-  <form method="POST" action="{mkurl action="index" page="create"}">
-    <div class="col-lg-3">
-      <div class="input-group">
-        <span class="input-group-addon">Pseudo</span>
-        <input class="form-control" type="text" name="user_name" required="" {if isset($smarty.post.user_name)}value="{$smarty.post.user_name}"{/if}/>
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Nom</span>
-        <input class="form-control" type="text" name="user_lastname" required="" {if isset($smarty.post.user_lastname)}value="{$smarty.post.user_lastname}"{/if} />
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Prénom</span>
-        <input class="form-control" type="text" name="user_firstname" required="" {if isset($smarty.post.user_firstname)}value="{$smarty.post.user_firstname}"{/if} />
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Mot de passe</span>
-        <input class="form-control" type="password" required="" name="user_pass" />
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Confirmation</span>
-        <input class="form-control" type="password" name="confirmPassword" required="" placeholder="Confirmez le mot de passe" />
-      </div>
-      <br/>
+
+<form method="POST" action="{mkurl action="index" page="create"}">
+    <div class="container">
+        <div class="alert alert-info">
+            <p><strong>Attention !</strong> L'inscription sur ce site ne tient pas lieu
+                d'inscription à l'association. Vous devez vous inscrire et cotiser en
+                tant qu'adhérent pour bénéficier de tous les services de ce site.
+            </p>
+        </div>
+        <div class="row centered-form">
+            <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Inscription à l'intranet EPITANIME</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group">
+                            <input type="text" name="user_name" id="user_name" class="form-control input-sm" placeholder="Pseudo (login)" value="{$smarty.post.user_name|default:''}" required />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" name="user_firstname" id="user_firstname" class="form-control input-sm" placeholder="Prénom" value="{$smarty.post.user_firstname|default:''}" />
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" name="user_lastname" id="user_lastname" class="form-control input-sm" placeholder="Nom" value="{$smarty.post.user_lastname|default:''}" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="email" name="user_email" id="user_email" class="form-control input-sm" placeholder="Email" value="{$smarty.post.user_email|default:''}" required />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="password" name="user_pass" id="user_pass" class="form-control input-sm" placeholder="Mot de passe">
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="password" name="confirmPassword" id="confirmPassword" class="form-control input-sm" placeholder="Confirmation">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group{if isset($error_captcha) && $error_captcha} has-error{/if}">
+                            <!-- Text input-->
+
+                            <a title="Nouvelle image" href="#" class="btn btn-default btn-sm" onclick="document.getElementById('captcha').src = '{mkurl action="index" page="securimage_show"}&' + Math.random();
+                                    return false"><img id="captcha" src="{mkurl action="index" page="securimage_show"}" alt="CAPTCHA Image" /></a>
+
+                        </div>
+
+                        <div class="form-group">
+                            <input id="captcha_code" name="captcha_code" placeholder="Texte de l'image" class="form-control input-md" required="" type="text">
+                        </div>
+
+                        <input type="submit" value="Créer le compte" class="btn btn-info btn-block">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</form>
 
-    <div class="col-lg-3">
-      <div class="input-group">
-        <span class="input-group-addon">Type</span>
-        <select name="user_type" class="form-control">
-          {foreach from=$types item="t"}
-              <option value="{$t.ut_id}" {if isset($smarty.post.user_type) && $t.ut_id == $smarty.post.user_type}selected{/if}>{$t.ut_name}</option>
-          {/foreach}
-        </select>
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Login IONIS</span>
-        <input class="form-control" type="text" name="user_login" {if isset($smarty.post.user_login)}value="{$smarty.post.user_login}"{/if} />
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Email</span>
-        <input class="form-control" type="text" name="user_email" required="" {if isset($smarty.post.user_email)}value="{$smarty.post.user_email}"{/if} />
-      </div>
-      <br/>
-      <div class="input-group">
-        <span class="input-group-addon">Téléphone</span>
-        <input class="form-control" type="text" name="user_phone" {if isset($smarty.post.user_phone)}value="{$smarty.post.user_phone}"{/if} />
-      </div>
-      <br/>
-    </div>
-    <div class="col-lg-4">
-
-      <!-- Text input-->
-      <div class="input-group{if isset($error_captcha) && $error_captcha} has-error{/if}">
-        <label class="input-group-addon" for="captcha_code">Vérification Captcha</label>
-        <a title="Nouvelle image" href="#" class="btn btn-default btn-sm" onclick="document.getElementById('captcha').src = '{mkurl action="index" page="securimage_show"}&' + Math.random();
-                return false"><img id="captcha" src="{mkurl action="index" page="securimage_show"}" alt="CAPTCHA Image" /></a>
-        <input id="captcha_code" name="captcha_code" placeholder="" class="form-control input-md" required="" type="text">
-      </div>
-
-      <br/><br/>
-      <div>
-        <input type="submit" name="Inscription" class="btn btn-success" />
-      </div>
-    </div>
-  </form>
-</div>
 {include "foot.tpl"}

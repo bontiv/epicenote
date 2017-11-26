@@ -33,17 +33,16 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-
 <ul class="nav nav-pills" role="tablist">
-  <li class="active"><a href="#edit" role="tablist" data-toggle="pill">Profile</a></li>
+  <li class="{if $smarty.get.page == 'profile'}active{/if}"><a href="#edit" role="tablist" data-toggle="pill">Profile</a></li>
   <li class=""><a href="#password" role="tablist" data-toggle="pill">Mot de passe</a></li>
   <li class=""><a href="#card" role="tablist" data-toggle="pill">Carte de membre</a></li>
-  <li class=""><a href="#print" role="tablist" data-toggle="pill">Fiche de membre</a></li>
+  <li class="{if $smarty.get.page == 'inscrip'}active{/if}"><a href="#print" role="tablist" data-toggle="pill">Fiche de membre</a></li>
   <li class=""><a href="#2factors" role="tablist" data-toggle="pill">Google Authenticator</a></li>
 </ul>
 
 <div class="pill-content">
-  <div class="pill-pane active" id="edit">
+  <div class="pill-pane{if $smarty.get.page == 'profile'} active{/if}" id="edit">
     <form method="POST" class="form-horizontal">
 
       <legend>Edition du profil</legend>
@@ -223,7 +222,7 @@
     {/if}
   </div>
 
-  <div class="pill-pane" id="print">
+  <div class="pill-pane{if $smarty.get.page == 'inscrip'} active{/if}" id="print">
     <h2>Création de la fiche de membre</h2>
     <p>
       La fiche de membre vous permet de valider votre adhésion à Epitanime.

@@ -20,20 +20,31 @@ define('ACL_ANNONYMOUS', 0);
 define('ACL_GUEST', 1);
 
 /**
+ * Utilisateur avec profil complet
+ */
+define('ACL_CPLUSER', 2);
+
+/**
  * Niveau d'accès pour les membres
  */
-define('ACL_USER', 2);
+define('ACL_USER', 3);
+
+/**
+ * Utilisateur avancé (email validé)
+ * ce champs est réservé mais non utilisé.
+ */
+define('ACL_ADVUSER', 4);
 
 /**
  * Niveau d'accès pour les membres avec surclassement par un module
  * Ce niveau d'accès particulier est donné par un module lors de son chargement si l'utilisateur peut réaliser des actions spéciales sur ce module. Par exemple, pour une section, l'utilisateur qui est "responsable de section" va avoir ce niveau sur toutes les pages qui concerne sa section.
  */
-define('ACL_SUPERUSER', 3);
+define('ACL_SUPERUSER', 5);
 
 /**
  * Niveau d'accès pour les administrateurs
  */
-define('ACL_ADMINISTRATOR', 4);
+define('ACL_ADMINISTRATOR', 6);
 
 /**
  * Menus par défaut
@@ -151,6 +162,10 @@ function aclFromText($txt) {
         return ACL_GUEST;
     if ($txt == "USER")
         return ACL_USER;
+    if ($txt == "CPLUSER")
+        return ACL_CPLUSER;
+    if ($txt == "ADVUSER")
+        return ACL_ADVUSER;
     if ($txt == "SUPERUSER")
         return ACL_SUPERUSER;
     if ($txt == "ADMINISTRATOR")
@@ -794,6 +809,21 @@ function login_user($user, $pass, $otp_code = null) {
     $sql = $pdo->prepare('SELECT * FROM users WHERE user_name = ?');
     $sql->bindValue(1, $user);
     $sql->execute();
+    
+    $log = $pdo->prepare('INSERT INTO logaudit (la_user, la_ip, la_date, la_type) VALUES (:user, :ip, now(), :type)');
+    $log->bindValue(':user', null);
+    $log->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
+    
+    $last = $pdo->prepare('SELECT COUNT(*) FROM logaudit WHERE la_date > now() - time("01:00:00") AND la_type = \'DENY\' AND (la_user = :user OR la_ip = :ip)');
+    $last->bindValue(':user', $user);
+    $last->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
+    $last->execute();
+    
+    //Blocage si trop d'essais
+    if ($last->fetchColumn() > 2) {
+        return -2;
+    }
+    
     if ($user = $sql->fetch()) {
         //Ici l'utilisateur existe
         if (strlen($user['user_pass']) != 32) // Mot de passe non chiffré ...
@@ -806,16 +836,22 @@ function login_user($user, $pass, $otp_code = null) {
                 return -1;
             }
         }
+        
+        $log->bindValue(':user', $user['user_id']);
 
         //Mot de passe correct ?
-        if (md5($user['user_pass'] . $_SESSION['random']) == $pass) {
+        if ((isset($_SESSION['random']) && md5($user['user_pass'] . $_SESSION['random']) == $pass) || $user['user_pass'] == $pass) {
             $_SESSION['user'] = $user;
             $_SESSION['user']['role'] = aclFromText($user['user_role']);
             unset($_SESSION['random']);
             $_SESSION['urltok'] = substr(sha1(uniqid()), 0, 16);
+            $log->bindValue(':type', 'ACCEPT');
+            $log->execute();
             return true;
         }
     }
+    $log->bindValue(':type', 'DENY');
+    $log->execute();
     return false;
 }
 
