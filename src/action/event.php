@@ -151,11 +151,27 @@ function event_staff() {
     quit();
 }
 
+function event_view() {
+    global $tpl, $pdo;
+
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event)
+        modexec('syscore', 'notfound');
+    
+    $tpl->assign('event', $event);
+    $tpl->display('event_head.tpl');
+    quit();
+}
+
 /**
  * Détails d'un événement
  * Cette page permet de voir les informations détaillés d'une section. Nous pouvons aussi utiliser cette page pour ajouter ou retirer la participation d'une section à un événement.
  */
-function event_view() {
+function event_sections() {
     global $tpl, $pdo;
 
     $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');

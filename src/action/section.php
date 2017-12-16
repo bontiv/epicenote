@@ -630,3 +630,15 @@ function section_trombi() {
 
     display();
 }
+
+function section_teams() {
+    $mdl = new Modele('sections');
+    $mdl->fetch($_REQUEST['section']);
+    $mdl->assignTemplate('section');
+
+    $teams = new Modele('sections');
+    $teams->find(array('section_parent' => $_GET['section']));
+    $teams->appendTemplate('sections');
+    
+    display();
+}

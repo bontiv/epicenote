@@ -121,8 +121,12 @@ $menu['DEFAULT'] = array(
                 'url' => 'admin_modeles',
             ),
             'ACLS' => array(
-                'label' => 'Droits d\'accès',
+                'label' => 'Droits d\'accès globaux',
                 'url' => 'admin',
+            ),
+            'ROLES' => array(
+                'label' => 'Modèles d\'accès',
+                'url' => 'admin_roles',
             ),
             'CARDS' => array(
                 'label' => 'Gestion des cartes',
@@ -150,6 +154,8 @@ $menu['DEFAULT'] = array(
         ),
     ),
 );
+
+$menu['event'] = array();
 
 /**
  * Pour récupérer la valeur numérique associé à un rôle
@@ -450,7 +456,11 @@ function mkmenu($type = 'DEFAULT') {
  * @param type $smarty
  */
 function mkmenu_smarty($params, $smarty) {
-    return mkmenu();
+    $type = 'DEFAULT';
+    if (isset($params['menu'])) {
+        $type = $params['menu'];
+    }
+    return mkmenu($type);
 }
 
 /**

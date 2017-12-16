@@ -33,4 +33,7 @@
   <li{if $smarty.get.page=='mls' or $smarty.get.page=='send'} class="active"{/if}>
     <a href="{mkurl action=section page=mls section=$section->section_id}">Grps. diffusion</a>
   </li>
+  <li{if $smarty.get.page=='teams'} class="active"{/if}>
+    <a href="{mkurl action=section page=teams section=$section->section_id}">Équipes</a>
+  </li>
 </ul>
