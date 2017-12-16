@@ -6,6 +6,7 @@ fields:
     type: auto_int
   section_name:
     type: var
+    label: Nom
   section_type:
     type: enum
     items:
@@ -19,6 +20,7 @@ fields:
       type: external
       label: "Section mère"
       display: %section_name%
+      table: sections
       null: true
   section_ml:
       type: var

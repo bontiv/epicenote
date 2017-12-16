@@ -23,6 +23,14 @@ function section_security($page, $params) {
     if ($mdl->count()) {
         return ACL_SUPERUSER;
     }
+    
+    $sec = new Modele('sections');
+    $sec->fetch($params['section']);
+    if ($sec->raw_section_type == 'secondary') {
+        $params['section'] = $sec->raw_section_parent;
+        return section_security($page, $params);
+    }
+    
     return false;
 }
 
@@ -79,7 +87,7 @@ function section_mkevent() {
 function section_index() {
     global $pdo, $tpl;
 
-    $sql = $pdo->prepare('SELECT * FROM sections LEFT JOIN users ON user_id = section_owner ORDER BY section_name');
+    $sql = $pdo->prepare('SELECT * FROM sections LEFT JOIN users ON user_id = section_owner WHERE section_type = "primary" ORDER BY section_name');
     $sql->execute();
     while ($line = $sql->fetch()) {
 
@@ -632,13 +640,53 @@ function section_trombi() {
 }
 
 function section_teams() {
+    global $pdo, $tpl;
+    
+    $mdl = new Modele('sections');
+    $mdl->fetch($_REQUEST['section']);
+    $mdl->assignTemplate('section');
+
+
+    $sql = $pdo->prepare('SELECT * FROM sections LEFT JOIN users ON user_id = section_owner WHERE section_parent = ? ORDER BY section_name');
+    $sql->bindValue(1, $_GET['section']);
+    $sql->execute();
+    while ($line = $sql->fetch()) {
+
+        $line['inType'] = isset($_SESSION['user']['sections'][$line['section_id']]) ? $_SESSION['user']['sections'][$line['section_id']]['us_type'] : false;
+        $subsql = $pdo->prepare('SELECT * FROM user_sections NATURAL JOIN users WHERE section_id = ? AND us_type = \'manager\'');
+        $subsql->bindValue(1, $line['section_id']);
+        $subsql->execute();
+        $managers = array();
+        while ($subline = $subsql->fetch())
+            $managers[] = $subline;
+        $line['managers'] = $managers;
+        $tpl->append('teams', $line);
+    }
+    
+    display();
+}
+
+function section_team_add() {
     $mdl = new Modele('sections');
     $mdl->fetch($_REQUEST['section']);
     $mdl->assignTemplate('section');
 
     $teams = new Modele('sections');
-    $teams->find(array('section_parent' => $_GET['section']));
-    $teams->appendTemplate('sections');
+    $teams->setFields(array(
+        'section_name'
+    ));
+    if (isset($_POST['section_name'])) {
+        $team = $teams->addFrom(array(
+            'section_name' => $_POST['section_name'],
+            'section_owner' => $_SESSION['user']['user_id'],
+            'section_parent' => $_GET['section'],
+            'section_type' => 'secondary',
+        ), true);
+        if ($team) {
+            redirect('section', 'teams', array('section' => $_GET['section'], 'hsuccess' => 1));
+        }
+    }
+    $teams->assignTemplate('team');
     
     display();
 }
