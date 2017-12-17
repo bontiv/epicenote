@@ -99,6 +99,13 @@ function section_index() {
         while ($subline = $subsql->fetch())
             $managers[] = $subline;
         $line['managers'] = $managers;
+        $subgrp = $pdo->prepare("SELECT * FROM sections WHERE section_parent = ?");
+        $subgrp->bindValue(1, $line['section_id']);
+        $subgrp->execute();
+        $line['subgrps'] = array();
+        while ($linegrp = $subgrp->fetch()) {
+            $line['subgrps'][] = $linegrp;
+        }
         $tpl->append('sections', $line);
     }
 
