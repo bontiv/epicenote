@@ -40,5 +40,9 @@
         <li{if $smarty.get.page=='teams'} class="active"{/if}>
             <a href="{mkurl action=section page=teams section=$section->section_id}">Équipes</a>
         </li>
+    {else}
+        <li{if $smarty.get.page=='acl'} class="active"{/if}>
+            <a href="{mkurl action=section page=acl section=$section->section_id}">Droits</a>
+        </li>
     {/if}
 </ul>

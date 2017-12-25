@@ -186,31 +186,79 @@ function aclFromText($txt) {
  */
 function hasAcl($acl, $action = null, $page = 'index', $params = null) {
     global $pdo;
-
+    
     if (!isset($_SESSION['user']) || $_SESSION['user'] == false || !isset($_SESSION['user']['role']))
         $user = ACL_ANNONYMOUS;
-    elseif ($action != null) {
-        $user = modsecu($action, $page, $params);
-        if ($user < $_SESSION['user']['role'])
-            $user = $_SESSION['user']['role'];
-    } else
+    else {
         $user = $_SESSION['user']['role'];
-
+    }
+    
+    if ($action != null) {
+        modsecu($user, $action, $page, $params);
+    }
+    
     // Tentative de rattrapage par groupe
     if ($user < ACL_SUPERUSER && $acl <= ACL_SUPERUSER) {
-        $sql = $pdo->prepare('SELECT ag_group FROM access_groups RIGHT JOIN acces ON ag_access = acl_id WHERE acl_action = ? AND acl_page = ?');
+        $sql = $pdo->prepare('SELECT ag_group, section_type FROM access_groups RIGHT JOIN acces ON ag_access = acl_id RIGHT JOIN sections ON section_id = ag_group WHERE acl_action = ? AND acl_page = ?');
         $sql->bindValue(1, $action !== null ? $action : 'index');
         $sql->bindValue(2, $page);
         $sql->execute();
         while ($line = $sql->fetch()) {
             // Test si utilisateur dans section $line[0]
-            if (isset($_SESSION['user']['sections'][$line[0]]) && $_SESSION['user']['sections'][$line[0]]['us_type'] == 'manager') {
+            if (
+                    $line[1] == 'primary' &&
+                    isset($_SESSION['user']['sections'][$line[0]]) &&
+                    $_SESSION['user']['sections'][$line[0]]['us_type'] == 'manager'
+            ) {
                 $user = ACL_SUPERUSER;
             }
         }
     }
 
     return $user >= $acl;
+}
+
+/**
+ * Find if user is on specified security group
+ * @param type $groupid
+ * @param type $action
+ * @param type $page
+ */
+function getAclGroup($groupid, $action = null, $page = 'index') {
+    global $pdo;
+    $level = false;
+    
+    if (!isset($_SESSION['user'])) {
+        return false;
+    }
+    
+    if(isset($_SESSION['user']['sections'][$groupid])) {
+        $level = $_SESSION['user']['sections'][$groupid]['us_type'];
+    }
+    
+    if ($action == null) {
+        return $level;
+    }
+        
+    $sql = $pdo->prepare('SELECT COUNT(*) FROM access_groups RIGHT JOIN acces ON ag_access = acl_id WHERE acl_action = :action AND acl_page = :page AND ag_group = :group');
+    $sql->bindValue('action', $action);
+    $sql->bindValue('page', $page);
+    
+    foreach ($_SESSION['user']['sections'] as $grp) {
+        if ($grp['section_parent'] == $groupid) {
+            $sql->bindValue('group', $grp['section_id']);
+            $sql->execute();
+            if ($sql->fetchColumn() > 0) {
+                if ($grp['us_type'] == 'manager') {
+                    $level = 'manager';
+                } elseif ($grp['us_type'] == 'user' && $level != 'manager') {
+                    $level = 'user';
+                }
+            }
+        }
+    }
+    
+    return $level;
 }
 
 /**
@@ -318,7 +366,7 @@ function mkurl($action, $page = 'index', $options = null) {
         $url .= '&_=' . $_SESSION['urltok'];
     }
     foreach ($data as $key => $val)
-        $url.= '&' . urlencode($key) . '=' . urlencode($val);
+        $url .= '&' . urlencode($key) . '=' . urlencode($val);
 
     return $url;
 }
@@ -489,7 +537,7 @@ function redirect($action, $page = 'index', $options = null) {
  * @param type $action
  * @param type $page
  */
-function modsecu($action, $page = 'index', $params = null) {
+function modsecu(&$value, $action, $page = 'index', $params = null) {
     global $root;
 
     if (!file_exists($root . 'action' . DS . $action . '.php'))
@@ -498,7 +546,11 @@ function modsecu($action, $page = 'index', $params = null) {
     include_once $root . 'action' . DS . $action . '.php';
 
     if (function_exists($action . '_security')) {
-        return call_user_func($action . '_security', $page, $params);
+        $level = call_user_func($action . '_security', $page, $params);
+        if ($level > $value) {
+            $value = $level;
+        }
+        return $level;
     }
     return false;
 }
@@ -819,21 +871,21 @@ function login_user($user, $pass, $otp_code = null) {
     $sql = $pdo->prepare('SELECT * FROM users WHERE user_name = ?');
     $sql->bindValue(1, $user);
     $sql->execute();
-    
+
     $log = $pdo->prepare('INSERT INTO logaudit (la_user, la_ip, la_date, la_type) VALUES (:user, :ip, now(), :type)');
     $log->bindValue(':user', null);
     $log->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
-    
+
     $last = $pdo->prepare('SELECT COUNT(*) FROM logaudit WHERE la_date > now() - time("01:00:00") AND la_type = \'DENY\' AND (la_user = :user OR la_ip = :ip)');
     $last->bindValue(':user', $user);
     $last->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
     $last->execute();
-    
+
     //Blocage si trop d'essais
     if ($last->fetchColumn() > 2) {
         return -2;
     }
-    
+
     if ($user = $sql->fetch()) {
         //Ici l'utilisateur existe
         if (strlen($user['user_pass']) != 32) // Mot de passe non chiffré ...
@@ -846,7 +898,7 @@ function login_user($user, $pass, $otp_code = null) {
                 return -1;
             }
         }
-        
+
         $log->bindValue(':user', $user['user_id']);
 
         //Mot de passe correct ?

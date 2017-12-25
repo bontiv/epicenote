@@ -697,3 +697,97 @@ function section_team_add() {
     
     display();
 }
+
+function section_acl() {
+    global $pdo, $tpl;
+    
+    $mdl = new Modele('sections');
+    $mdl->fetch($_REQUEST['section']);
+    $mdl->assignTemplate('section');
+
+    $acl = $pdo->prepare(
+            'SELECT * FROM acces '
+            . 'WHERE acl_action != "index"'
+            . 'AND acl_action != "admin" '
+            . 'AND acl_acces = "SUPERUSER" '
+            . 'OR (SELECT COUNT(*) FROM access_groups WHERE ag_access = acl_id AND ag_group = :group) > 1 '
+            . 'ORDER BY acl_action ASC, acl_page ASC');
+    $acl->bindValue('group', $mdl->getKey());
+    $acl->execute();
+    
+    $agrp = $pdo->prepare(
+            'SELECT ag_access FROM access_groups WHERE ag_group = :group');
+    $agrp->bindValue('group', $mdl->getKey());
+    $agrp->execute();
+    $grps = $agrp->fetchAll(PDO::FETCH_COLUMN, 0);
+    
+    $acls = array();
+    while($line = $acl->fetch()) {
+        $action = $line['acl_action'];
+        $aclid = $line['acl_id'];
+        
+        if (!isset($acls[$action])) {
+            $acls[$action] = array();
+        }
+        $acls[$action][$aclid] = $line;
+        $acls[$action][$aclid]['acl_enable'] = in_array($aclid, $grps);
+        
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $newAcl = isset($_POST['acl-' . $aclid]) && $_POST['acl-' . $aclid];
+            if ($newAcl != $acls[$action][$aclid]['acl_enable']) {
+                if ($newAcl) {
+                    $upd = $pdo->prepare('INSERT INTO access_groups (ag_access, ag_group) VALUES (:access, :group)');
+                } else {
+                    $upd = $pdo->prepare('DELETE FROM access_groups WHERE ag_access = :access AND ag_group = :group');
+                }
+                $upd->bindValue('access', $aclid);
+                $upd->bindValue('group', $mdl->getKey());
+                $upd->execute();
+                $acls[$action][$aclid]['acl_enable'] = $newAcl;
+            }
+            $tpl->assign('hsuccess', true);
+        }
+    }
+    $tpl->assign('acls', $acls);
+    display();
+}
+
+function section_staff_add() {
+    global $pdo;
+
+    // Autocomplete
+    if (isset($_GET['format']) && $_GET['format'] == 'json') {
+        $sql = $pdo->prepare("SELECT user_name, user_firstname, user_lastname FROM users WHERE user_name LIKE :term OR user_firstname LIKE :term OR user_lastname LIKE :term ORDER BY user_name ASC LIMIT 10");
+        $sql->bindValue('term', "%$_GET[term]%");
+        $sql->execute();
+
+        echo json_encode($sql->fetchAll(PDO::FETCH_ASSOC));
+        quit();
+    }
+    
+    if (isset($_POST['login'])) {
+        $mdl = new Modele('user_sections');
+        $usr = $pdo->prepare('SELECT user_id FROM users WHERE user_name = ?');
+        foreach (explode(',', $_POST['login']) as $login) {
+            $usr->bindValue(1, trim($login));
+            $usr->execute();
+            $usrDetails = $usr->fetch();
+            if ($usrDetails !== false) {
+                $mdl->find(array(
+                    'us_user' => $usrDetails['user_id'],
+                    'us_section' => $_REQUEST['section'],
+                ));
+                if ($mdl->next()) {
+                    $mdl->us_type = 'user';
+                } else {
+                    $mdl->addFrom(array(
+                        'us_user' => $usrDetails['user_id'],
+                        'us_section' => $_REQUEST['section'],
+                        'us_type' => 'manager',
+                    ));
+                }
+            }
+        }
+        redirect('section', 'details', array('section' => $_REQUEST['section'], 'hsuccess' => 1));
+    }
+}

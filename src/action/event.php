@@ -17,16 +17,10 @@ function event_security($page, $params) {
     if (!$_SESSION['user'])
         return false;
 
-    // Rattrapage manager de l'event
-    $us->find(array(
-        'us_user' => $_SESSION['user']['user_id'],
-        'us_section' => $event->event_section->section_id,
-        'us_type' => 'manager'
-    ));
-    if ($us->count()) {
+    if (getAclGroup($event->event_section->section_id, 'event', $page) == 'manager') {
         return ACL_SUPERUSER;
     }
-
+    
     // Rattrapage manager de section event
     if (preg_match('`^staff(|_.*)$`', $page)) {
         $us->find(array(
