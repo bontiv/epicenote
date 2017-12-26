@@ -392,13 +392,22 @@ function mkurl_smarty($params, $smarty) {
 }
 
 /**
+ * Execute template subfunction
+ * @param type $params
+ * @param type $smarty
+ */
+function tplfunc_smarty($params, $smarty) {
+    
+}
+
+/**
  * Créé un item de menu
  *
  * @param type $item tableau d'items
  * @param type $level niveau du menu
  * @return string HTML
  */
-function mkmenuItem($item, $level = 0) {
+function mkmenuItem($item, $level = 0, $extra = null) {
     $txt = "";
 
     if (isset($item['sub'])) {
@@ -409,7 +418,7 @@ function mkmenuItem($item, $level = 0) {
                 <b class="caret"></b></a>
               <ul class="dropdown-menu">';
         foreach ($item['sub'] as $sub) {
-            $stxt .= mkmenuItem($sub, $level + 1);
+            $stxt .= mkmenuItem($sub, $level + 1, $extra);
         }
         if (strlen($stxt) == 0) {
             return "";
@@ -420,6 +429,9 @@ function mkmenuItem($item, $level = 0) {
         $opts = array();
         $action = 'index';
         $page = 'index';
+        if ($extra !== null) {
+            $opts = array_merge($opts, $extra);
+        }
 
         if (is_string($item['url'])) {
             $action = $item['url'];
@@ -431,7 +443,7 @@ function mkmenuItem($item, $level = 0) {
             if (isset($item['url']['page'])) {
                 $page = $item['url']['page'];
             }
-            $opts = $item['url'];
+            //$opts = $item['url'];
             unset($opts['action']);
             unset($opts['page']);
         }
@@ -471,7 +483,7 @@ function cleanMenu($type = 'DEFAULT') {
  * @param type $type type de menu
  * @return str HTML
  */
-function mkmenu($type = 'DEFAULT') {
+function mkmenu($type = 'DEFAULT', $extra = null) {
     global $menu, $tmpdir;
 
     $html = "";
@@ -491,7 +503,7 @@ function mkmenu($type = 'DEFAULT') {
     }
 
     foreach ($xmenu as $item) {
-        $html .= mkmenuItem($item);
+        $html .= mkmenuItem($item, 0, $extra);
     }
 
     return $html;
@@ -508,7 +520,9 @@ function mkmenu_smarty($params, $smarty) {
     if (isset($params['menu'])) {
         $type = $params['menu'];
     }
-    return mkmenu($type);
+    
+    $newparams = array_diff_key($params, array('menu' => 0));
+    return mkmenu($type, $newparams);
 }
 
 /**

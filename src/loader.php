@@ -67,6 +67,7 @@ $tpl->compile_dir = $tmpdir;
 $tpl->template_dir = $root . 'templates';
 $tpl->registerPlugin('function', 'mkurl', 'mkurl_smarty');
 $tpl->registerPlugin('function', 'mkmenu', 'mkmenu_smarty');
+$tpl->registerPlugin('function', 'tplfunc', 'tplfunc_smarty');
 $tpl->registerPlugin('block', 'acl', 'acl_smarty');
 
 if (!is_dir($tpl->compile_dir))
