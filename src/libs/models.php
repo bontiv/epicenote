@@ -71,7 +71,7 @@ function mdle_field_type($table_info, $field) {
         return 'int(' . (isset($field['size']) ? $field['size'] : 10) . ')';
 
     if ($field['type'] == 'file')
-        return 'blob';
+        return 'mediumblob';
 
     if ($field['type'] == 'bool')
         return 'enum(\'true\', \'false\')';
