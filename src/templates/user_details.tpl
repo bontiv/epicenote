@@ -69,7 +69,7 @@
     </button>
   </div>
   <div class="col-lg-6">
-    {if $user.user_photo != ""}
+    {if $user.user_picture != ""}
         {acl action="user" page="viewphoto"}
         <img src="{mkurl action="user" page="viewphoto" user=$user.user_id}" />
         {/acl}

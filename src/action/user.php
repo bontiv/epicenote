@@ -462,7 +462,7 @@ function user_viewphoto() {
     $usr->fetch($_GET['user']);
 
     header('Content-Type: image/png');
-    readfile($usr->user_photo);
+    echo($usr->user_picture->up_picture);
     quit();
 }
 

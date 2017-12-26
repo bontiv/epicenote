@@ -93,8 +93,6 @@ function mdle_sql_fielddef($table, $col) {
         $sql .= ' AUTO_INCREMENT';
     if (isset($data['default']))
         $sql .= ' DEFAULT ' . $pdo->quote($data['default']);
-    elseif ($data['type'] == 'file')
-        $sql .= ' DEFAULT NULL';
     return $sql;
 }
 
@@ -508,7 +506,7 @@ class Modele {
             if ($desc['type'] == 'auto_int')
                 continue;
 
-            if ($desc['type'] == 'file' && !is_resource($data[$name]))
+            if ($desc['type'] == 'file' && !is_resource($data[$name]) && !is_string($data[$name]))
                 continue;
 
             if (!isset($data[$name]) && isset($desc['default'])) {

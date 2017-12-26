@@ -66,12 +66,12 @@ fields:
     type: date
     label: date de naissance
     null: true
-  user_photo:
-    type: var
-    size: 200
-    label: Photo d'identité
-    visible: admin
-    null: true
+  user_picture:
+      type: external
+      table: user_picture
+      label: Photo
+      display: %up_id% - %up_date%
+      null: true
 
   user_role:
     type: enum

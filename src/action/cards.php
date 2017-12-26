@@ -39,7 +39,7 @@ function cards_makeme() {
     $fdir = $srcdir . DS . 'libs' . DS . 'font' . DS;
 
     $c_black = imagecolorallocate($imgd, 0, 0, 0);
-    $picture = imagecreatefrompng($usr->user_photo);
+    $picture = imagecreatefromstring($usr->user_picture->up_picture);
     imagecopy($imgd, $picture, 66, 60, 0, 0, 210, 270);
     imagettftext($imgd, 90, 0, 400, 100, $c_black, $fdir . 'data-latin.ttf', 'EPITANIME');
     imagettftext($imgd, 30, 0, 400, 150, $c_black, $fdir . 'go3v2.ttf', $mdt->mandate_label);

@@ -1,0 +1,18 @@
+## YAML Template.
+---
+name: user_picture
+key: up_id
+fields:
+    up_id:
+        type: auto_int
+    up_user:
+        type: external
+        table: users
+        display: %user_lastname% %user_fisrtname% (%user_name%)
+        label: Utilisateur
+    up_picture:
+        type: file
+        label: Photo
+    up_date:
+        type: date_time
+        label: Date enregistrement

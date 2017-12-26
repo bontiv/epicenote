@@ -563,10 +563,18 @@ function index_photoedit() {
     $usr = new Modele('users');
     $usr->fetch($_SESSION['user']['user_id']);
 
-    $filename = tempnam($tmpdir, 'photo');
-    error_reporting(E_ALL);
-    imagepng($imgd, $filename);
-    $usr->user_photo = $filename;
+    ob_start();
+    imagepng($imgd);
+    $imgdata = ob_get_clean();
+    
+    $pic = new Modele('user_picture');
+    $pic->addFrom(array(
+        'up_user' => $usr->getKey(),
+        'up_picture' => $imgdata,
+        'up_date' => date('Y-m-d H:i:s'),
+    ));
+    
+    $usr->user_picture = $pic->getKey();
     redirect('index', 'profile');
 }
 
@@ -575,7 +583,7 @@ function index_photo() {
     $usr->fetch($_SESSION['user']['user_id']);
 
     header('Content-Type: image/png');
-    readfile($usr->user_photo);
+    echo ($usr->user_picture->up_picture);
     quit();
 }
 
