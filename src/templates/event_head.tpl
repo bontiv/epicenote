@@ -1,4 +1,6 @@
 {include "head.tpl"}
+{tplfunc action="event" page="head"}
+
 <h1>Fiche d'événement : {$event.event_name}</h1>
 
 <ol class="breadcrumb">

@@ -397,7 +397,20 @@ function mkurl_smarty($params, $smarty) {
  * @param type $smarty
  */
 function tplfunc_smarty($params, $smarty) {
+    global $root;
     
+    $action = $params['action'];
+    $page = $params['page'];
+    unset($params['action'], $params['page']);
+    
+    if (file_exists($root . 'action' . DS . $action . '.php')) {
+        include_once $root . 'action' . DS . $action . '.php';
+    } else {
+        $exec_extend = Extend::getAction($action);
+        $exec_extend->init($action);
+    }
+
+    call_user_func("tpl_${action}_${page}", $params, $smarty);
 }
 
 /**

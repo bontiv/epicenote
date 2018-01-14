@@ -1,0 +1,23 @@
+## YAML Template.
+---
+name: rh_section
+key: rs_id
+fields:
+    rs_id:
+        type: auto_int
+    rs_name:
+        type: var
+        label: Nom de la section
+    rs_section:
+        type: external
+        table: sections
+        label: Section asso
+        display: %section_name%
+    rs_type:
+        type: enum
+        label: Type
+        items:
+            BOTH: Séléctable et attribuable
+            SELEC: Séléctable sur candidature
+            ATTRIB: Attribuable en section
+            

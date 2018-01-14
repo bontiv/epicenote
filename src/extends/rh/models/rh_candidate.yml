@@ -1,0 +1,51 @@
+## YAML Template.
+---
+name: rh_candidate
+key: rc_id
+fields:
+    rc_id:
+        type: auto_int
+    rc_user:
+        type: external
+        table: users
+        display: %user_name%
+        label: Utilisateur
+    rc_event:
+        type: external
+        table: events
+        display: %event_name%
+        label: Evénement
+    rc_picture:
+        type: external
+        table: user_picture
+        display: %up_user%
+        label: Photo
+    rc_firstname:
+        type: var
+        label: Prénom
+    rc_lastname:
+        type: var
+        label: Nom
+    rc_pseudo:
+        type: var
+        label: Pseudo
+    rc_wsection_choose1:
+        type: external
+        table: rh_section
+        display: %rs_name%
+        null: true
+    rc_wsection_choose2:
+        type: external
+        table: rh_section
+        display: %rs_name%
+        null: true
+    rc_wsection_choose3:
+        type: external
+        table: rh_section
+        display: %rs_name%
+        null: true
+    rc_asection:
+        type: external
+        table: rh_section
+        display: %rs_name%
+        null: true

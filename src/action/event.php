@@ -34,6 +34,24 @@ function event_security($page, $params) {
     }
 }
 
+function tpl_event_head($params, $smarty) {
+    global $pdo;
+
+    if ($smarty->getTemplateVars('event') !== NULL) {
+        return;
+    }
+    
+    $sql = $pdo->prepare('SELECT * FROM events LEFT JOIN users ON event_owner = user_id LEFT JOIN sections ON section_id = event_section WHERE event_id = ?');
+    $sql->bindValue(1, $_GET['event']);
+    $sql->execute();
+
+    $event = $sql->fetch();
+    if (!$event) {
+        modexec('syscore', 'notfound');
+    }
+    $smarty->assign('event', $event);
+}
+
 /**
  * Liste les événements
  * Permet de lister tous les événements enregistrés sur l'intra.

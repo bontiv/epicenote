@@ -178,7 +178,7 @@ class Extend {
         //Ajout des tables
         $addTables = array_diff_key($defTables, $inTables);
         foreach ($addTables as $table) {
-            $pdo->execute(mdle_sql_create($table));
+            $pdo->exec(mdle_sql_create($table));
         }
 
         $checkTables = array_intersect_key($defTables, $inTables);

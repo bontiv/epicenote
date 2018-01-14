@@ -1,0 +1,21 @@
+## YAML Template.
+---
+name: rh_event
+key: re_id
+fields:
+    re_id:
+        type: auto_int
+    re_event:
+        type: external
+        table: events
+        display: %event_name%
+        label: "Evénemet"
+    re_step1:
+        type: date
+        label: Ouverture étape 1
+        null: true
+    re_step2:
+        type: date
+        label: Ouverture étape 2
+        null: true
+        

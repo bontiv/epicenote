@@ -1,0 +1,16 @@
+## YAML Template.
+---
+name: rh_section_event
+key: rse_id
+fields:
+    rse_id:
+        type: auto_int
+    rse_section:
+        type: external
+        table: rh_section
+        display: %rs_name%
+    rse_event:
+        type: external
+        table: events
+        display: %event_name%
+        
