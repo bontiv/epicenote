@@ -49,3 +49,9 @@ fields:
         table: rh_section
         display: %rs_name%
         null: true
+    rc_text:
+        type: text
+        label: Text de candidature
+    rc_comment:
+        type: text
+        label: Commentaire

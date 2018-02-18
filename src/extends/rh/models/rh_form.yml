@@ -1,0 +1,34 @@
+## YAML Template.
+---
+name: rh_form
+key: rf_id
+fields:
+    rf_id:
+        type: auto_int
+    rf_event:
+        type: external
+        table: events
+        label: Evenement
+        display: %event_name%
+    rf_type:
+        type: enum
+        label: Type de champs
+        items:
+            SHORTTEXT: Texte court
+            LONGTEXT: Zone de texte
+            PHONE: Numéro de téléphone
+            ADDRESS: Adresse
+            DROPDOWN: Liste déroulante
+            CHECKBOX: Cases à 
+            RADIO: Adresse
+            STEP: Adresse
+            SECTION: Adresse
+    rf_order:
+        type: int
+        label: ordre
+    rf_validation:
+        type: enum
+        default: NO
+        items:
+            NO: non
+            YES: Oui
