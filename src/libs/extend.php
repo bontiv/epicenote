@@ -398,6 +398,7 @@ class Extend {
 
         $tpldir = realpath($this->extdir . '/templates');
         $tpl->assign('extendTpls', $tpldir);
+        $tpl->addTemplateDir($tpldir);
         $tpl->display($tpldir . '/' . $file . '.tpl');
     }
 
