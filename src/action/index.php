@@ -504,7 +504,7 @@ function index_print() {
 
     $pdf->SetFont('Arial', 'I', 8);
     $pdf->SetXY(185, 10);
-    $pdf->Cell(10, 5, $usr->getKey(), 0, 0, 'R');
+    $pdf->Cell(10, 5, $usr->getKey() . '.' . $sub->subscription_id, 0, 0, 'R');
 
     $pos = -1;
     $pdf->SetFont('Arial', '', 10);

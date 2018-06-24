@@ -22,6 +22,7 @@
         <thead>
             <tr>
                 <th>Nom cotisation</th>
+                <th>Nombre</th>
                 <th>Tarif</th>
                 <th>Action</th>
             </tr>
@@ -30,6 +31,7 @@
             {foreach $cotis as $cot}
                 <tr>
                     <td>{$cot->subscription_label}</td>
+                    <td>{$cot->reverse('user_mandate')->count()}</td>
                     <td>{$cot->subscription_price} €</td>
                     <td>
                         <a href="{mkurl action=admin_note page=delcotis cotis=$cot->getKey()}" class="btn btn-danger btn-sm">
