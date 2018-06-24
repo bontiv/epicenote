@@ -27,6 +27,8 @@ if ($_SERVER['PATH_INFO'] == '/.well-known/openid-configuration') {
     $page = 'userinfo';
 } elseif ($_SERVER['PATH_INFO'] == '/register') {
     $page = 'register';
+} elseif ($_SERVER['PATH_INFO'] == '/signup') {
+    $page = 'signup';
 } else {
     echo $_SERVER['PATH_INFO'];
     exit;

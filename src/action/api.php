@@ -206,16 +206,16 @@ function api_token() {
 //    $_POST['client_id'];
 //    $_POST['client_secret'];
     //On ne fait que des tokens d'auth
-    if ($_REQUEST['grant_type'] != 'authorization_code') {
-        return _api_error('grant_type', 'Only authorization_code is supported');
+    if ($_REQUEST['grant_type'] != 'authorization_code' && $_REQUEST['grant_type'] != 'client_credentials') {
+        return _api_error('grant_type', 'Only authorization_code and client_credentials is supported');
     }
-    
+
     // Récuperation client ID
     if (isset($_SERVER['PHP_AUTH_PW'])) {
         $_REQUEST['client_secret'] = $_SERVER['PHP_AUTH_PW'];
     }
-    
-    
+
+
     //Recherche du client
     $cli = new Modele('api_clients');
     $cli->find(array(
@@ -226,6 +226,62 @@ function api_token() {
         return _api_error('unauthorized_client', 'API client denied.');
     }
 
+
+    if ($_REQUEST['grant_type'] == 'authorization_code') {
+        return _api_token_authorize($cli);
+    } elseif ($_REQUEST['grant_type'] == 'client_credentials') {
+        return _api_token_client($cli);
+    }
+}
+
+function _api_token_client($cli) {
+    $token = array(
+        'at_client' => $cli->getKey(),
+        'at_type' => 'ACCESS',
+        'at_code' => md5(uniqid('', true)),
+        'at_nonce' => '',
+        'at_state' => '',
+        'at_scope' => isset($_GET['scope']) ? $_GET['scope'] : '',
+        'at_user' => 0,
+        'at_start' => time(),
+        'at_expire' => time() + 3600,
+    );
+    $tok = new Modele('api_tokens');
+    $tok->addFrom($token);
+    //Reponse
+    $config = _api_config();
+
+    $header = array(
+        'alg' => 'RS256',
+        'typ' => 'JWT',
+            //'kid' => 12, // Key ID
+    );
+
+    $claims = array(
+        'iss' => $config['issuer'],
+        'sub' => $tok->at_code,
+        'aud' => $cli->ac_client,
+        'exp' => $tok->at_expire,
+        'iat' => $tok->at_start,
+    );
+    if ($tok->at_nonce != '') {
+        $claims['nonce'] = $tok->at_nonce;
+    }
+
+    $payload = base64url_encode(json_encode($header)) . '.' . base64url_encode(json_encode($claims));
+
+    $token = array(
+        'id_token' => $payload . '.' . base64url_encode(_api_sign($payload)),
+        'access_token' => $tok->at_code,
+        'token_type' => 'bearer',
+        'expires_in' => 3600,
+    );
+
+    echo json_encode($token);
+    quit();
+}
+
+function _api_token_authorize($cli) {
     //Verif callback client
     $allowed_callbaks = explode("\n", $cli->ac_callback);
     foreach ($allowed_callbaks as &$callback) {
@@ -342,25 +398,25 @@ function api_jwks() {
 function _api_getUser() {
     if (!isset($_REQUEST['access_token'])) {
         $auth = '';
-        
+
         if (isset($_SERVER['Authorization'])) {
             $auth = $_SERVER['Authorization'];
         }
-        
+
         if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
             $auth = $_SERVER['HTTP_AUTHORIZATION'];
         }
-        
+
         if (function_exists('getallheaders')) {
             $headers = getallheaders();
             $auth = $headers['Authorization'];
         }
-        
+
         if (preg_match('/Bearer\s(\S+)/', $auth, $matches)) {
             $_REQUEST['access_token'] = $matches[1];
         }
     }
-    
+
     $tok = new Modele('api_tokens');
     $tok->find(array(
         'at_code' => $_REQUEST['access_token'],
@@ -411,5 +467,34 @@ function api_userinfo() {
 }
 
 function api_register() {
-    
+    echo '{"error":"invalid_client_metadata","error_description":"Not authorized"}';
+    quit();
+}
+
+function api_signup() {
+    _api_getUser();
+    $user = new Modele('users');
+
+    $user->find(array('user_name' => $_POST['user_name']));
+    if ($user->next()) {
+        echo '{"error":"invalid_user","error_description":"Ce nom d\'utilisateur est déjà utilisé."}';
+        quit();
+    }
+
+    $user->find(array('user_email' => $_POST['user_email']));
+    if ($user->next()) {
+        echo '{"error":"invalid_user","error_description":"Cet email est déjà utilisé."}';
+        quit();
+    }
+
+    $user->addFrom(array(
+        'user_name' => $_POST['user_name'],
+        'user_firstname' => $_POST['user_firstname'],
+        'user_lastname' => $_POST['user_lastname'],
+        'user_pass' => md5($_POST['user_name'] . ':' . $_POST['user_password']),
+        'user_email' => $_POST['user_email'],
+        'user_role' => 'GUEST',
+    ));
+    echo json_encode($user->toArray());
+    quit();
 }
