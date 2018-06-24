@@ -804,7 +804,7 @@ function uc($txt) {
  * @return boolean True si authentification réussie
  */
 function login_user($user, $pass, $otp_code = null) {
-    global $pdo, $srcdir;
+    global $pdo, $srcdir, $config;
 
     $sql = $pdo->prepare('SELECT * FROM users WHERE user_name = ?');
     $sql->bindValue(1, $user);
@@ -820,7 +820,7 @@ function login_user($user, $pass, $otp_code = null) {
     $last->execute();
     
     //Blocage si trop d'essais
-    if ($last->fetchColumn() > 2) {
+    if ($last->fetchColumn() > $config['cms']['max_logaudit']) {
         return -2;
     }
     
