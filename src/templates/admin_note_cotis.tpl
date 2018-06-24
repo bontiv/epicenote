@@ -10,11 +10,27 @@
     <small>{$mandate->mandate_label}</small>
 </h1>
 
+{if $mandate->raw_mandate_state == 'DRAFT'}
+    <div class="alert alert-warning">
+        <strong>Attention !</strong>
+        <p>Ce mandat n'est pas activé. Cliquez sur "Valider" afin d'activer ce mandat. Les membres pourront alors s'inscrire mais les mandats ne seont
+            plus éditables.</p>
+    </div>
+{/if}
+
 <p>
-    <a href='{mkurl action=admin_note page=addcotis mandate=$mandate->getKey()}' class="btn btn-primary">
-        <i class="glyphicon glyphicon-plus"></i>
-        Ajout
-    </a>
+    {if $mandate->raw_mandate_state == 'DRAFT'}
+        <a href='{mkurl action=admin_note page=addcotis mandate=$mandate->getKey()}' class="btn btn-primary">
+            <i class="glyphicon glyphicon-plus"></i>
+            Ajout
+        </a>
+        {if isset($cotis)}
+            <a href='{mkurl action=admin_note page=addcotis mandate=$mandate->getKey()}' class="btn btn-success">
+                <i class="glyphicon glyphicon-check"></i>
+                Valider
+            </a>
+        {/if}
+    {/if}
 </p>
 
 {if isset($cotis)}
@@ -34,9 +50,11 @@
                     <td>{$cot->reverse('user_mandate')->count()}</td>
                     <td>{$cot->subscription_price} €</td>
                     <td>
-                        <a href="{mkurl action=admin_note page=delcotis cotis=$cot->getKey()}" class="btn btn-danger btn-sm">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </a>
+                        {if $mandate->raw_mandate_state == 'DRAFT'}
+                            <a href="{mkurl action=admin_note page=delcotis cotis=$cot->getKey()}" class="btn btn-danger btn-sm">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        {/if}
                     </td>
                 </tr>
 
@@ -45,7 +63,7 @@
     </table>
 {else}
     <div class="alert alert-info">
-        <p>Il n'y a aucune cotisation sur ce mandat !</p>
+        <p>Il n'y a aucune cotisation sur ce mandat ! Vous ne pouvez pas valider le mandat sans cotisation.</p>
     </div>
 {/if}
 {include "foot.tpl"}

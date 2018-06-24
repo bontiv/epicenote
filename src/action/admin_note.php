@@ -97,7 +97,7 @@ function admin_note_addmandate() {
             $upd->bindValue(1, $endlast->format('Y-m-d'));
             $upd->bindValue(2, $mdl->getKey());
             $upd->execute();
-            redirect("admin_note", "mandate", array('hsuccess' => 1));
+            redirect("admin_note", "cotis", array('hsuccess' => 1, 'mandate' => $mdl->getKey()));
         }
         $tpl->assign('hsuccess', false);
     }

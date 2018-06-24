@@ -107,6 +107,15 @@ function index_index() {
     if (hasAcl(ACL_GUEST) && $_SESSION['user']['user_role'] == 'GUEST' || isset($_GET['step']) && $_GET['step'] <= 4) {
         _index_inscrip();
     }
+    
+    if (hasAcl(ACL_ADMINISTRATOR)) {
+        $ago = $pdo->prepare("SELECT COUNT(*) FROM mandate WHERE DATE_ADD(NOW(), INTERVAL 45 DAY) < mandate_end ");
+        $ago->execute();
+        $line = $ago->fetch();
+        if ($line) {
+            $tpl->assign('ago', $line[0]);
+        }
+    }
 
     $tpl->assign('isMember', hasAcl(ACL_USER));
     $tpl->display('index.tpl');

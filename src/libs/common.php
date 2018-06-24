@@ -104,6 +104,13 @@ $menu['DEFAULT'] = array(
                 'label' => 'Utilisateurs',
                 'url' => 'user',
             ),
+            'ADMIN' => array(
+                'label' => 'Administrateurs',
+                'url' => array(
+                    'action' => 'admin',
+                    'page' => 'list'
+                ),
+            ),
             'SCHOOL' => array(
                 'label' => 'Ecoles',
                 'url' => 'ecole',

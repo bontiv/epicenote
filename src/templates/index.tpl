@@ -136,6 +136,23 @@
                 </div>
             {/if}
 
+            {if isset($ago) and $ago eq 0}
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Gestion du mandat</h4>
+                        </div>
+                        <div class="panel-body">
+                            <p>Le mandat arrive bientôt à expiration. Il est temps d'organiser une AGO !</p>
+                            <ul style="list-style-type: square;">
+                                <li><a href="{mkurl action="admin_note" page="mandate"}">Gérer les mandats</a></li>
+                                <li><a href="{mkurl action="admin" page="list"}">Gérer les admins intranet</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {/if}
+
         </div>
     </div>
 
