@@ -46,6 +46,10 @@ function event_security($page, $params) {
  */
 function event_index() {
     global $tpl;
+    
+    $sections = new Modele('sections');
+    $sections->find();
+    $sections->appendTemplate('sections');
 
     $p = new SimplePager('events', 'WHERE `event_end` >= NOW()');
     $p->run($tpl);
