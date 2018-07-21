@@ -5,3 +5,7 @@ fields:
         type: int
         label: Temps (mins) avant déconnexion
         default: 1
+    max_logaudit:
+        type: int
+        label: Nombre de tentatives de connexion maximal par heure
+        default: 9
