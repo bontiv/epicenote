@@ -13,7 +13,7 @@
 {/if}
 
 <h1>Gestion événementiel</h1>
-<h2>Création d'événement</h2>
+<h2>Création d'événement pour {$sectmdl->section_name}</h2>
 
 <form method="POST" action="{mkurl action="section" page="mkevent" section=$section}">
   <form class="form-horizontal">
