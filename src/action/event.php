@@ -425,35 +425,15 @@ function event_addpoints() {
 
         while ($user = $sql->fetch()) {
             $markOk = $_POST['staff-' . $user['user_id'] . '-ok'];
-            $markPeriod = $_POST['staff-' . $user['user_id'] . '-period'];
             $markMark = $_POST['staff-' . $user['user_id'] . '-mark'];
 
             if ($markOk == 'YES') {
                 $dataMark['mark_user'] = $user['user_id'];
-                $dataMark['mark_period'] = $markPeriod;
                 $mdlMark->addFrom($dataMark);
             }
         }
         redirect('event', 'staff_activities', array('event' => $event->getKey(), 'section' => $section->section_id, 'hsuccess' => '1'));
     }
-
-    $types = new Modele('user_types');
-    $types->find();
-    $repPeriods = array();
-
-    while ($type = $types->next()) {
-        $periods = $pdo->prepare('SELECT * FROM periods WHERE period_start < NOW() AND period_end > NOW() AND period_type = ? AND period_state = "ACTIVE"');
-        $periods->bindValue(1, $types->ut_id);
-        $periods->execute();
-
-        while ($period = $periods->fetch()) {
-            if (!isset($repPeriods[$types->ut_id])) {
-                $repPeriods[$types->ut_id] = array();
-            }
-            $repPeriods[$types->ut_id][] = $period;
-        }
-    }
-    $tpl->assign('periods', $repPeriods);
 
     $sql = $pdo->prepare('SELECT * FROM event_staff LEFT JOIN users ON user_id =est_user WHERE est_section = ? AND est_event = ? ORDER BY user_name');
     $sql->bindValue(1, $section->getKey());

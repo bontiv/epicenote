@@ -23,6 +23,7 @@ fields:
     table: periods
     display: %period_start% - %period_end%
     label: Période
+    null: true
 
 indexes:
   ind_mark_user:

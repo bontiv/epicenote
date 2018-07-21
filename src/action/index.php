@@ -107,6 +107,15 @@ function index_index() {
     if (hasAcl(ACL_GUEST) && $_SESSION['user']['user_role'] == 'GUEST' || isset($_GET['step']) && $_GET['step'] <= 4) {
         _index_inscrip();
     }
+    
+    if (hasAcl(ACL_ADMINISTRATOR)) {
+        $ago = $pdo->prepare("SELECT COUNT(*) FROM mandate WHERE DATE_ADD(NOW(), INTERVAL 45 DAY) < mandate_end ");
+        $ago->execute();
+        $line = $ago->fetch();
+        if ($line) {
+            $tpl->assign('ago', $line[0]);
+        }
+    }
 
     $tpl->assign('isMember', hasAcl(ACL_USER));
     $tpl->display('index.tpl');
@@ -320,9 +329,12 @@ function index_profile() {
     }
 
     $mdt = new Modele('mandate');
-    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now()', 'mandate_end DESC')) {
-        while ($line = $mdt->next()) {
-            $tpl->append('mandate', $line);
+    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now() and mandate_state = "ACTIVE"', 'mandate_ago DESC')) {
+        if ($mdt->next()) {
+            $mdt->assignTemplate('mandate');
+            $sub = new Modele('subscription');
+            $sub->find(array('subscription_mandate' => $mdt->getKey()));
+            $sub->appendTemplate('subs');
         }
     }
 
@@ -337,6 +349,7 @@ function index_profile() {
     $tpl->assign('random', $_SESSION['random']);
     $tpl->assign('isMember', hasAcl(ACL_USER));
     $tpl->assign('form', $mdl->edit());
+    $tpl->assign('completed', hasAcl(ACL_CPLUSER));
 
     $mdl = new Modele('card');
     $mdl->find(array('card_user' => $_SESSION['user']['user_id']));
@@ -361,37 +374,31 @@ function index_profile() {
     display();
 }
 
-function index_subscriptions() {
-    $sub = new Modele('subscription');
-    if ($sub->find()) {
-        //if ($sub->find(array('subscription_mandate' => $_GET['mandate']))) {
-        while ($line = $sub->next()) {
-            echo '<option value="' . $line['subscription_id'] . '">' . $line['subscription_label'] . ' (montant ' . $line['subscription_price'] . ' €)</option>';
-        }
-    }
-    quit();
-}
-
 function index_print() {
     global $root, $srcdir, $tmpdir;
 
     include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'fpdf.php';
     include_once $srcdir . DS . 'libs' . DS . 'barcode.php';
 
-    if (!isset($_POST['mandate']))
-        $_POST['mandate'] = 1;
     if (!isset($_POST['subscription']))
         $_POST['subscription'] = 1;
 
     $mdt = new Modele('mandate');
-    $mdt->fetch($_POST['mandate']);
+    if (!$mdt->find('`mandate_start` < now() and `mandate_end` > now() and mandate_state = "ACTIVE"', 'mandate_ago DESC')) {
+        dbg_error(__FILE__, 'Erreur SQL sur mandat');
+    }
+    if (!$mdt->next()) {
+        dbg_error(__FILE__, 'Mandat non actif');
+    }
     $sub = new Modele('subscription');
     $sub->fetch($_POST['subscription']);
     $usr = new Modele('users');
     $usr->fetch($_SESSION['user']['user_id']);
     $sublist = new Modele('subscription');
     //$sublist->find(array('subscription_mandate' => $mdt->mandate_id));
-    $sublist->find();
+    $sublist->find(array(
+        'subscription_mandate' => $mdt->getKey(),
+    ));
 
     if (new DateTime($mdt->mandate_start) > new DateTime() || new DateTime($mdt->mandate_end) < new DateTime()) {
         modexec('syscore', 'moderror');
@@ -506,7 +513,7 @@ function index_print() {
 
     $pdf->SetFont('Arial', 'I', 8);
     $pdf->SetXY(185, 10);
-    $pdf->Cell(10, 5, $usr->getKey(), 0, 0, 'R');
+    $pdf->Cell(10, 5, $usr->getKey() . '.' . $sub->subscription_id, 0, 0, 'R');
 
     $pos = -1;
     $pdf->SetFont('Arial', '', 10);

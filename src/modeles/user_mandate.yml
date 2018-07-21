@@ -12,3 +12,9 @@ fields:
     type: external
     table: mandate
     display: %mandate_label%
+  um_subscrib:
+      type: external
+      table: subscription
+      display: %subscription_label%
+      label: Souscription
+      null: true

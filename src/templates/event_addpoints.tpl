@@ -28,7 +28,6 @@
           <th>Pseudo</th>
           <th>Nom</th>
           <th>Prénom</th>
-          <th>Période</th>
           <th>Ingorer</th>
           <th>Note (sur 20)</th>
         </tr>
@@ -39,13 +38,6 @@
               <td>{$staff.user_name|escape}</td>
               <td>{$staff.user_lastname|escape}</td>
               <td>{$staff.user_firstname|escape}</td>
-              <td>
-                <select class="input-md form-control" name="staff-{$staff.user_id}-period">
-                  {foreach $periods[$staff.user_type] as $period}
-                      <option value="{$period.period_id}">{$period.period_label}</option>
-                  {/foreach}
-                </select>
-              </td>
               <td>
                 <select name="staff-{$staff.user_id}-ok" class="input-sm form-control">
                   <option selected="selected" value="YES">Noter</option>

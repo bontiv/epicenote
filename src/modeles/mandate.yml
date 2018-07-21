@@ -10,11 +10,26 @@ fields:
     type: var
     size: 20
     label: Mandat
+    
+  mandate_ago:
+      type: date
+      label: date d'AGO
 
   mandate_start:
     type: date
-    label: Début
+    label: Ouverture inscriptions
+    null: true
 
   mandate_end:
     type: date
-    label: Fin
+    label: Fin inscriptions
+    null: true
+
+  mandate_state:
+      type: enum
+      default: DRAFT
+      label: Statut
+      items:
+          DRAFT: Brouillon
+          ACTIVE: Inscriptions actives
+          DISABLED: Inscriptions closes

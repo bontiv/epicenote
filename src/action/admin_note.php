@@ -69,13 +69,35 @@ function admin_note_mandate() {
 }
 
 function admin_note_addmandate() {
-    global $tpl;
+    global $tpl, $pdo;
 
     $mdl = new Modele('mandate');
+    $mdl->setFields(array(
+        'mandate_label',
+        'mandate_ago',
+    ));
+    
     $mdl->assignTemplate('mandat');
     if (isset($_POST['edit'])) {
-        if ($mdl->addFrom($_POST)) {
-            redirect("admin_note", "mandate", array('hsuccess' => 1));
+        $enddate = new DateTime($_POST['mandate_ago']);
+        $enddate->add(new DateInterval("P1Y"));
+        $enddate->sub(new DateInterval("P14D"));
+        $data = array(
+            'mandate_label' => $_POST['mandate_label'],
+            'mandate_ago' => $_POST['mandate_ago'],
+            'mandate_end' => $enddate->format('Y-m-d'),
+        );
+        
+        if ($mdl->addFrom($data, true)) {
+            //End other mandates
+            $endlast = new DateTime($_POST['mandate_ago']);
+            $endlast->add(new DateInterval('P1M'));
+            
+            $upd = $pdo->prepare('UPDATE mandate SET mandate_end = ?, mandate_state = "DISABLED" WHERE mandate_end > now() AND mandate_id != ?');
+            $upd->bindValue(1, $endlast->format('Y-m-d'));
+            $upd->bindValue(2, $mdl->getKey());
+            $upd->execute();
+            redirect("admin_note", "cotis", array('hsuccess' => 1, 'mandate' => $mdl->getKey()));
         }
         $tpl->assign('hsuccess', false);
     }
@@ -90,6 +112,23 @@ function admin_note_delmandate() {
     } else {
         redirect("admin_note", "mandate", array('hsuccess' => 1));
     }
+}
+
+function admin_note_modmandate() {
+    global $tpl;
+    
+    $mdl = new Modele('mandate');
+    $mdl->fetch($_REQUEST['mandate']);
+
+    if (isset($_POST['mandate_label'])) {
+        if ($mdl->modFrom($_POST)) {
+            redirect('admin_note', 'mandate', array('hsuccess' => 1));
+        } else {
+            $tpl->assign('hsuccess', false);
+        }
+    }
+        $mdl->assignTemplate('mandate');
+        display();
 }
 
 function admin_note_periods() {
@@ -196,4 +235,77 @@ function admin_note_downbulletin() {
 
     bulletin_download($_GET['id']);
     quit();
+}
+
+function admin_note_cotis() {
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+    
+    $cotis = new Modele('subscription');
+    $cotis->find(array(
+        'subscription_mandate' => $mdt->getKey(),
+    ));
+    
+    $cotis->appendTemplate('cotis');
+    $mdt->assignTemplate('mandate');
+    display();
+}
+
+function admin_note_addcotis() {
+    global $tpl;
+    
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+    $cotis = new Modele('subscription');
+    $cotis->setFields(array(
+        'subscription_label',
+        'subscription_price'
+    ));
+    
+    if (isset($_POST['subscription_label'])) {
+        $data = array(
+            'subscription_label' => $_POST['subscription_label'],
+            'subscription_price' => $_POST['subscription_price'],
+            'subscription_mandate' => $mdt->getKey(),
+        );
+        if ($cotis->addFrom($data, true)) {
+            redirect('admin_note', 'cotis', array('hsuccess' => 1, 'mandate' => $mdt->getKey()));
+        } else {
+            $tpl->assign('hsuccess', false);
+        }
+    }
+
+    $cotis->assignTemplate('cotis');
+    
+    $mdt->assignTemplate('mandate');
+    display();    
+}
+
+function admin_note_delcotis() {
+    $cot = new Modele('subscription');
+    $cot->fetch($_GET['cotis']);
+    
+    $mdl = $cot->raw_subscription_mandate;
+    $cot->delete();
+    redirect('admin_note', 'cotis', array('mandate' => $mdl, 'hsuccess' => 1));
+}
+
+function admin_note_disable_mandate () {
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+    
+    $mdt->mandate_state = 'DISABLED';
+    redirect('admin_note', 'mandate', array('hsuccess' => 1));
+}
+
+function admin_note_active_mandate () {
+    $mdt = new Modele('mandate');
+    $mdt->fetch($_GET['mandate']);
+
+    if ($mdt->raw_mandate_state == 'DRAFT') {
+        $mdt->mandate_start = date('Y-m-d');
+    }
+    
+    $mdt->mandate_state = 'ACTIVE';
+    redirect('admin_note', 'mandate', array('hsuccess' => 1));
 }

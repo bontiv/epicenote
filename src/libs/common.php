@@ -104,12 +104,19 @@ $menu['DEFAULT'] = array(
                 'label' => 'Utilisateurs',
                 'url' => 'user',
             ),
+            'ADMIN' => array(
+                'label' => 'Administrateurs',
+                'url' => array(
+                    'action' => 'admin',
+                    'page' => 'list'
+                ),
+            ),
             'SCHOOL' => array(
                 'label' => 'Ecoles',
                 'url' => 'ecole',
             ),
             'MARKING' => array(
-                'label' => 'Notation',
+                'label' => 'Mandats & Notations',
                 'url' => 'admin_note',
             ),
             'MAILLING' => array(

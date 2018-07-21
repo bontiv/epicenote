@@ -89,3 +89,67 @@ function admin_update() {
 
     redirect('admin');
 }
+
+function admin_list() {
+    $list = new Modele('users');
+    $list->find(array(
+        'user_role' => 'ADMINISTRATOR',
+    ));
+    $list->appendTemplate('admins');
+    display();
+}
+
+function admin_autocomplete() {
+    global $pdo;
+
+    $sql = $pdo->prepare("SELECT * FROM users WHERE user_role != 'ADMINISTRATOR'"
+            . " AND (user_firstname LIKE :term OR user_lastname LIKE :term OR user_name LIKE :term) ORDER BY user_name ASC");
+    $sql->bindValue(':term', '%' . $_REQUEST['term'] . '%');
+    $sql->execute();
+    echo '[';
+    $first = true;
+    while ($line = $sql->fetch()) {
+        if ($first) {
+            $first = false;
+        } else {
+            echo ',';
+        }
+        echo json_encode(array(
+            'label' => "$line[user_firstname] $line[user_lastname] ($line[user_name])",
+            'value' => $line['user_name']
+        ));
+    }
+    echo ']';
+    quit();
+}
+
+function admin_add() {
+    $usr = new Modele('users');
+    $usr->find(array('user_name' => $_REQUEST['addadmin']));
+    if ($usr->next()) {
+        $usr->modFrom(array(
+            'user_role' => 'ADMINISTRATOR',
+        ));
+        redirect('admin', 'list', array('hsuccess' => 1));
+    } else {
+        redirect('admin', 'list', array('hsuccess' => 0));
+    }
+}
+
+function admin_remove() {
+    global $pdo;
+    
+    $usr = new Modele('users');
+    $usr->fetch($_REQUEST['user']);
+    
+    $sql = $pdo->prepare('SELECT count(*) FROM user_mandate LEFT JOIN mandate ON um_mandate = mandate_id WHERE mandate_end > NOW() AND um_user = :user');
+    $sql->bindValue(':user', $usr->getKey());
+    $sql->execute();
+    $nbMdt = $sql->fetch();
+    
+    $usr->modFrom(array(
+        'user_role' => $nbMdt > 0 ? 'USER' : 'CPLUSER',
+    ));
+    
+    redirect('admin', 'list', array('hsuccess' => 1));
+}

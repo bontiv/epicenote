@@ -387,10 +387,18 @@ function user_add_mandate($user, $mandate) {
     $usr = new Modele('users');
     $mdt = new Modele('mandate');
     $lnk = new Modele('user_mandate');
+    $sub = new Modele('subscription');
+    $cotis = null;
 
     if (preg_match('/^9([0-9]{4})([0-9]{7})[0-9]$/', $user, $matchs)) {
         $user = $matchs[2];
         $mandate = $matchs[1];
+    }
+    elseif (preg_match('/^([0-9]+).([0-9]+)$/', $user, $matchs)) {
+        $user = $matchs[1];
+        $cotis = $matchs[2];
+        $sub->fetch($cotis);
+        $mandate = $sub->raw_subscription_mandate;
     }
 
     $usr->fetch($user);
@@ -402,11 +410,17 @@ function user_add_mandate($user, $mandate) {
             )) && $lnk->count() > 0) {
         return true;
     }
-
-    $succ = $lnk->addFrom(array(
+    
+    $subAdd = array(
         'um_user' => $usr->getKey(),
         'um_mandate' => $mdt->getKey(),
-    ));
+    );
+    
+    if ($cotis != null) {
+        $subAdd['um_subscrib'] = $cotis;
+    }
+
+    $succ = $lnk->addFrom($subAdd);
 
     if ($succ && (aclFromText($usr->raw_user_role) < ACL_USER)) {
         $usr->user_role = ACL_USER;
