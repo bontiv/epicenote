@@ -36,6 +36,10 @@ function section_mkevent() {
     $tpl->assign('error', false);
     $tpl->assign('succes', false);
     $tpl->assign('section', $_GET['section']);
+    
+    $sect = new Modele('sections');
+    $sect->fetch($_GET['section']);
+    $sect->assignTemplate('sectmdl');
 
     if (isset($_POST['event_name'])) {
         $dateStart = new DateTime($_POST['event_start']);
