@@ -3,9 +3,9 @@
 <!-- Begin page content -->
 
 <footer class="footer">
-  <div class="container">
-    <p class="text-muted">&COPY; EPITANIME 2012 - 2016</p>
-  </div>
+    <div class="container">
+        <p class="text-muted">&COPY; EPITANIME 2012 - 2018 - <a style="color:#777" href="{mkurl action="rgpd"}">Mentions légales et RGPD</a></p>
+    </div>
 </footer>
 
 
@@ -15,6 +15,16 @@
     var _paq = _paq || [];
     _paq.push(['trackPageView']);
     _paq.push(['enableLinkTracking']);
+    {if $_user}
+    _paq.push(['setUserId', '{$_user.user_name|escape}']);
+    {else}
+    _paq.push(['resetUserId']);
+    {/if}
+    // require user consent before processing data
+    _paq.push(['requireConsent']);
+    _paq.push(['trackPageview']);
+    _paq.push(['rememberConsentGiven']);
+
     (function () {
         var u = "//stats.bonnetlive.net/";
         _paq.push(['setTrackerUrl', u + 'piwik.php']);

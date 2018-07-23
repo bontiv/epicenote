@@ -256,6 +256,15 @@ function user_view() {
         $sections[] = $line['section_id'];
         $tpl->append('sections', $line);
     }
+    
+    //Last connection
+    $lstConnect = $pdo->prepare('SELECT la_date, la_ip FROM logaudit WHERE la_user = ? AND la_type = "ACCEPT" ORDER BY la_date DESC LIMIT 1');
+    $lstConnect->bindValue(1, $user['user_id']);
+    $lstConnect->execute();
+    $audit = $lstConnect->fetch(PDO::FETCH_ASSOC);
+    if ($audit) {
+        $tpl->assign('audit', $audit);
+    }
 
     //List events
     $sql = $pdo->prepare('SELECT * FROM event_staff'

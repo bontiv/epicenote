@@ -319,7 +319,7 @@ function mkurl($action, $page = 'index', $options = null) {
         $url .= '&_=' . $_SESSION['urltok'];
     }
     foreach ($data as $key => $val)
-        $url.= '&' . urlencode($key) . '=' . urlencode($val);
+        $url .= '&' . urlencode($key) . '=' . urlencode($val);
 
     return $url;
 }
@@ -802,6 +802,14 @@ function uc($txt) {
     return iconv('UTF-8', 'ISO-8859-1//TRANSLIT//IGNORE', $txt);
 }
 
+function _upd_user($userid) {
+    $usr = new Modele('users');
+    $usr->fetch($userid);
+    if (strlen($usr->user_email) > 0) {
+        $usr->user_hmail = md5(strtolower($usr->user_email));
+    }
+}
+
 /**
  * Permet d'authentifier un utilisateur
  *
@@ -816,21 +824,21 @@ function login_user($user, $pass, $otp_code = null) {
     $sql = $pdo->prepare('SELECT * FROM users WHERE user_name = ?');
     $sql->bindValue(1, $user);
     $sql->execute();
-    
+
     $log = $pdo->prepare('INSERT INTO logaudit (la_user, la_ip, la_date, la_type) VALUES (:user, :ip, now(), :type)');
     $log->bindValue(':user', null);
     $log->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
-    
+
     $last = $pdo->prepare('SELECT COUNT(*) FROM logaudit WHERE la_date > now() - time("01:00:00") AND la_type = \'DENY\' AND (la_user = :user OR la_ip = :ip)');
     $last->bindValue(':user', $user);
     $last->bindValue(':ip', $_SERVER['REMOTE_ADDR']);
     $last->execute();
-    
+
     //Blocage si trop d'essais
     if ($last->fetchColumn() > $config['cms']['max_logaudit']) {
         return -2;
     }
-    
+
     if ($user = $sql->fetch()) {
         //Ici l'utilisateur existe
         if (strlen($user['user_pass']) != 32) // Mot de passe non chiffré ...
@@ -843,7 +851,7 @@ function login_user($user, $pass, $otp_code = null) {
                 return -1;
             }
         }
-        
+
         $log->bindValue(':user', $user['user_id']);
 
         //Mot de passe correct ?
@@ -854,6 +862,9 @@ function login_user($user, $pass, $otp_code = null) {
             $_SESSION['urltok'] = substr(sha1(uniqid()), 0, 16);
             $log->bindValue(':type', 'ACCEPT');
             $log->execute();
+
+            //Update user private profile value
+            _upd_user($user['user_id']);
             return true;
         }
     }

@@ -22,6 +22,7 @@ $cronActions = array(
     "user:execSync",
     "user:remove_old",
     "ml:execUpdate",
+    "rgpd:execute",
 );
 
 //Execution des actions
