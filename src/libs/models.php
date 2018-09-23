@@ -560,7 +560,7 @@ class Modele {
             $data = array_intersect_key($data, array_flip($secure));
             $secure = true;
         }
-
+        
         foreach ($this->desc['fields'] as $name => $desc) {
             if ($desc['type'] == 'auto_int')
                 continue;
@@ -568,9 +568,9 @@ class Modele {
             if (!$secure && $desc['type'] == 'file')
                 continue;
 
-            if (!isset($data[$name]))
+            if (!array_key_exists($name, $data))
                 continue;
-
+            
             if ($desc['type'] == 'file' && !is_resource($data[$name]))
                 continue;
 
@@ -582,11 +582,9 @@ class Modele {
 
             if ($data[$name] == '' && isset($desc['default'])) {
                 $data[$name] = $desc['default'];
-            } elseif (!isset($data[$name])) {
-                continue;
             }
 
-            if ($nbVals != 0)
+                if ($nbVals != 0)
                 $sql .= ', ';
 
             $this->instance[$name] = $data[$name];

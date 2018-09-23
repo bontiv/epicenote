@@ -87,6 +87,14 @@ fields:
       SUPERUSER: Utilisateur acrédité
       ADMINISTRATOR: Administrateur
 
+  user_hmail:
+      type: var
+      default: ''
+      size: 100
+      label: "Hash Email"
+      visible: admin
+      null: true
+
   user_status:
       type: enum
       default: ACTIVE
@@ -116,3 +124,6 @@ indexes:
   user_name:
     type: unique
     fields: [user_name]
+  mailh:
+      type: unique
+      fields: [user_hmail]

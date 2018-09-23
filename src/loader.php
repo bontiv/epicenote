@@ -35,6 +35,8 @@ $urlbase = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/' . $urlbase;
  */
 define('FPDF_FONTPATH', $root . 'libs' . DS . 'font' . DS);
 
+setlocale(LC_ALL, 'fr');
+
 /**
  * Chargmenet des bibliothèques nécessaire au fonctionnement
  */

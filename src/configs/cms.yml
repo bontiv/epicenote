@@ -9,3 +9,7 @@ fields:
         type: int
         label: Nombre de tentatives de connexion maximal par heure
         default: 9
+    rgpd_days:
+        type: int
+        label: Nombre de jours depuis la dernière connexion d'un utilisateur avant suppression des données personnelles.
+        default: 730

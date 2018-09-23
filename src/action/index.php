@@ -219,7 +219,8 @@ function index_create() {
                 'user_lastname' => $_POST['user_lastname'],
                 'user_email' => $_POST['user_email'],
                 'user_pass' => $pass,
-                'user_role' => 'GUEST'
+                'user_role' => 'GUEST',
+                'user_hmail' => md5(strtolower($_POST['user_email'])),
             ));
 
 
@@ -317,8 +318,10 @@ function index_profile() {
 
     $mdl->fetch($_SESSION['user']['user_id']);
 
-    if (isset($_POST['edit']))
+    if (isset($_POST['edit'])) {
         $tpl->assign('hsuccess', $mdl->modFrom($_POST));
+        $mdl->user_hmail = md5(strtolower($mdl->user_email));
+    }
 
     if (isset($_POST['editpass'])) {
         if ($_POST['pwd1'] == '' || $_POST['oldpass'] != md5($_SESSION['user']['user_pass'] . $_SESSION['random'])) {
@@ -609,7 +612,7 @@ function index_password() {
         } else {
             // Recherche du membre
             $mdl = new Modele('users');
-            $mdl->find(array('user_email' => $_POST['mail']));
+            $mdl->find(array('user_hmail' => md5(strtolower($_POST['mail']))));
             if (!$mdl->next()) {
                 $tpl->assign('msg', 'L\'adresse email est introuvable');
                 $tpl->assign('error_mail', true);
