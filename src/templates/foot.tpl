@@ -21,9 +21,7 @@
     _paq.push(['resetUserId']);
     {/if}
     // require user consent before processing data
-    _paq.push(['requireConsent']);
     _paq.push(['trackPageview']);
-    _paq.push(['rememberConsentGiven']);
 
     (function () {
         var u = "//stats.bonnetlive.net/";
