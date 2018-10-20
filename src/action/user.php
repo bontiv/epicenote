@@ -408,6 +408,8 @@ function user_add_mandate($user, $mandate) {
         $cotis = $matchs[2];
         $sub->fetch($cotis);
         $mandate = $sub->raw_subscription_mandate;
+    } else {
+        return false;
     }
 
     $usr->fetch($user);
