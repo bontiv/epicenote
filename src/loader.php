@@ -55,6 +55,8 @@ require_once $root . 'libs' . DS . 'phpmailer' . DS . 'class.phpmailer.php';
 //Initialisation du captcha
 require_once $root . 'libs' . DS . 'securimage' . DS . 'securimage.php';
 
+require_once $root . 'vendor' . DS . 'autoload.php';
+
 //Initialisation du PDO
 $pdo = new PDO($dsn, $db_user, $db_pass);
 
@@ -110,7 +112,7 @@ $CSRF_withelist = array(
 );
 
 //Etapes seulement si HTTP
-if (!CONSOLE) {
+if (!CONSOLE && !defined("CUSTOM")) {
 
 
     if (!isset($action)) {
