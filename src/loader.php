@@ -73,6 +73,10 @@ $tpl->registerPlugin('function', 'mkurl', 'mkurl_smarty');
 $tpl->registerPlugin('function', 'mkmenu', 'mkmenu_smarty');
 $tpl->registerPlugin('block', 'acl', 'acl_smarty');
 
+// SSO parameters
+define("ONELOGIN_CUSTOMPATH", $srcdir . DIRECTORY_SEPARATOR . 'configs' . DIRECTORY_SEPARATOR . 'saml' . DIRECTORY_SEPARATOR);
+
+
 if (!is_dir($tpl->compile_dir))
     @mkdir($tpl->compile_dir, 0777);
 

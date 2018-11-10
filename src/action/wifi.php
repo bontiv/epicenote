@@ -153,8 +153,13 @@ function wifi_allow() {
 function wifi_login() {
     global $tpl;
     $redirect = $_GET['url'];
+    
+    $newUrl = mkurl('wifi', 'allow', array('url' => $redirect));
+    
+    $auth = new \OneLogin\Saml2\Auth();
+    $auth->login($newUrl);
 
-    redirect("index", "login", array('redirect' => 'wifi/allow/url=' . urlencode($redirect)));
+    //redirect("index", "login", array('redirect' => 'wifi/allow/url=' . urlencode($redirect)));
     exit;
 
     if (isset($_POST['login'])) {

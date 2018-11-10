@@ -12,7 +12,7 @@ fields:
   user_pass:
     visible: false
     type: var
-    size: 34
+    size: 72
   user_firstname:
     type: var
     size: 20

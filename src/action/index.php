@@ -130,6 +130,9 @@ function index_index() {
 function index_login() {
     global $tpl;
 
+    $auth = new \OneLogin\Saml2\Auth();
+    $auth->login();
+    return;
     $tpl->assign('msg', false);
 
     //Tentative de connexion
@@ -176,10 +179,12 @@ function index_login() {
 function index_logout() {
     global $tpl;
 
-    $_SESSION['user'] = false;
-    unset($_SESSION['user']);
-    $_SESSION = array();
-    redirect('index');
+//    $_SESSION['user'] = false;
+//    unset($_SESSION['user']);
+//    $_SESSION = array();
+//    redirect('index');
+    $auth = new \OneLogin\Saml2\Auth();
+    $auth->logout();
 }
 
 /**
