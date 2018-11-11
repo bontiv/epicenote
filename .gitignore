@@ -8,3 +8,5 @@
 /tmp/*.cache
 /PHPDocFill.html
 /src/configs/saml/
+
+!.gitkeep
