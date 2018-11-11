@@ -101,6 +101,9 @@ while ($dat = $conf->fetch()) {
     $config[$parts[0]][$parts[1]] = $dat['value'];
 }
 
+// Set SAML login configuration
+$config['cms']['saml'] = file_exists(ONELOGIN_CUSTOMPATH . 'settings.php');
+
 //CSRF Whitelist
 $CSRF_withelist = array(
     'index' => array(

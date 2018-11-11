@@ -151,29 +151,18 @@ function wifi_allow() {
 }
 
 function wifi_login() {
-    global $tpl;
+    global $tpl, $config;
     $redirect = $_GET['url'];
-    
-    $newUrl = mkurl('wifi', 'allow', array('url' => $redirect));
-    
-    $auth = new \OneLogin\Saml2\Auth();
-    $auth->login($newUrl);
 
-    //redirect("index", "login", array('redirect' => 'wifi/allow/url=' . urlencode($redirect)));
-    exit;
+    if ($config['cms']['saml']) {
+        $newUrl = mkurl('wifi', 'allow', array('url' => $redirect));
 
-    if (isset($_POST['login'])) {
-        $tpl->assign('hsuccess', login_user($_POST['login'], $_POST['password']));
+        $auth = new \OneLogin\Saml2\Auth();
+        $auth->login($newUrl);
+        quit();
+    } else {
+        redirect("index", "login", array('redirect' => 'wifi/allow/url=' . urlencode($redirect)));
     }
-
-    if (isset($_SESSION['user']) && $_SESSION['user']) {
-        redirect('wifi', 'allow', array('url' => $redirect));
-    }
-
-    $_SESSION['random'] = uniqid();
-    $tpl->assign('random', $_SESSION['random']);
-    $tpl->assign('redirect', $redirect);
-    display();
 }
 
 function wifi_getToken() {
