@@ -209,6 +209,8 @@ function index_create() {
             $tpl->assign('error', 'Mot de passes pas assez long...');
         } elseif ($_POST['user_pass'] != $_POST['confirmPassword']) {
             $tpl->assign('error', 'Mot de passes différents...');
+        } elseif (strtolower(strrchr($_POST['user_email'], "@")) == "@epitanime.com") {
+            $tpl->assign('error', "L'adresse email n'est pas valide.");
         } elseif (!_index_create_testmail($_POST['user_email'])) {
             $tpl->assign('error', "L'adresse email n'a pas pu être validée.");
         } else {
