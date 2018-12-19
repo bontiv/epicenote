@@ -321,8 +321,12 @@ function index_profile() {
     $mdl->fetch($_SESSION['user']['user_id']);
 
     if (isset($_POST['edit'])) {
-        $tpl->assign('hsuccess', $mdl->modFrom($_POST));
-        $mdl->user_hmail = md5(strtolower($mdl->user_email));
+        if (strtolower(strrchr($_POST['user_email'], "@")) == "@epitanime.com") {
+            $tpl->assign('error', "L'adresse email n'est pas valide.");
+        } else {
+            $tpl->assign('hsuccess', $mdl->modFrom($_POST));
+            $mdl->user_hmail = md5(strtolower($mdl->user_email));
+        }
     }
 
     if (isset($_POST['editpass'])) {
