@@ -620,7 +620,7 @@ function index_password() {
             $mdl = new Modele('users');
             $mdl->find(array('user_hmail' => md5(strtolower($_POST['mail']))));
             if (!$mdl->next()) {
-                $mdl->find(array('user_mail' => $_POST['mail']));
+                $mdl->find(array('user_email' => $_POST['mail']));
                 if (!$mdl->next()) {
                     $tpl->assign('msg', 'L\'adresse email est introuvable');
                     $tpl->assign('error_mail', true);
