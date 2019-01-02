@@ -620,23 +620,24 @@ function index_password() {
             $mdl = new Modele('users');
             $mdl->find(array('user_hmail' => md5(strtolower($_POST['mail']))));
             if (!$mdl->next()) {
-                $tpl->assign('msg', 'L\'adresse email est introuvable');
-                $tpl->assign('error_mail', true);
-
-                // Membre existe
-            } else {
-                $_SESSION['index_password_code'] = uniqid();
-                $_SESSION['index_password_email'] = $_POST['mail'];
-                $tpl->assign('url', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . mkurl('index', 'password_change', array(
-                            session_name() => session_id(),
-                            'valid' => $_SESSION['index_password_code']
-                )));
-                $mail = getMailer();
-                $mail->AddAddress($_SESSION['index_password_email']);
-                $mail->Subject = '[intra EPITANIME] mot de passe perdu';
-                $mail->Body = $tpl->fetch('mail_password.tpl');
-                $tpl->assign('msuccess', $mail->Send());
+                $mdl->find(array('user_mail' => $_POST['mail']));
+                if (!$mdl->next()) {
+                    $tpl->assign('msg', 'L\'adresse email est introuvable');
+                    $tpl->assign('error_mail', true);
+                    display();
+                }
             }
+            $_SESSION['index_password_code'] = uniqid();
+            $_SESSION['index_password_email'] = $_POST['mail'];
+            $tpl->assign('url', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . mkurl('index', 'password_change', array(
+                        session_name() => session_id(),
+                        'valid' => $_SESSION['index_password_code']
+            )));
+            $mail = getMailer();
+            $mail->AddAddress($_SESSION['index_password_email']);
+            $mail->Subject = '[intra EPITANIME] mot de passe perdu';
+            $mail->Body = $tpl->fetch('mail_password.tpl');
+            $tpl->assign('msuccess', $mail->Send());
         }
     }
 
