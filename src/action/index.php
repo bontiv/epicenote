@@ -629,7 +629,7 @@ function index_password() {
             }
             $_SESSION['index_password_code'] = uniqid();
             $_SESSION['index_password_email'] = $_POST['mail'];
-            $tpl->assign('url', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . mkurl('index', 'password_change', array(
+            $tpl->assign('url', $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . mkurl('index', 'password_change', array(
                         session_name() => session_id(),
                         'valid' => $_SESSION['index_password_code']
             )));
