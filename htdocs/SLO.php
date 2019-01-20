@@ -20,13 +20,12 @@ if (isset($_SESSION) && isset($_SESSION['LogoutRequestID'])) {
     $requestID = null;
 }
 
-$auth->processSLO(false, $requestID);
-
-$errors = $auth->getErrors();
-
 $_SESSION['user'] = false;
 unset($_SESSION['user']);
 $_SESSION = array();
-redirect('index');
 
-var_dump($errors);
+$auth->processSLO(false, $requestID);
+
+$errors = $auth->getErrors();
+#var_dump($errors);
+redirect('index');

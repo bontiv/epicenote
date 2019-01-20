@@ -86,6 +86,7 @@ fields:
       ADVUSER: (Réservé) Utilisateur 
       SUPERUSER: Utilisateur acrédité
       ADMINISTRATOR: Administrateur
+      SYSADMIN: System administrator
 
   user_hmail:
       type: var

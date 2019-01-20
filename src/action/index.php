@@ -132,7 +132,14 @@ function index_login() {
 
     if ($config['cms']['saml']) {
         $auth = new \OneLogin\Saml2\Auth();
-        $auth->login();
+        if (isset($_REQUEST['redirect'])) {
+            $opts = explode('/', $_REQUEST['redirect']);
+            $command = http_build_query(array('action' => $opts[0], 'page' => $opts[1]));
+            $url = "${_SERVER['REQUEST_SCHEME']}://${_SERVER['HTTP_HOST']}${_SERVER['SCRIPT_NAME']}?${command}&${opts[2]}";
+            $auth->login($url);
+        } else {
+            $auth->login();
+        }
         return;
     }
 

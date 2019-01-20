@@ -47,6 +47,11 @@ define('ACL_SUPERUSER', 5);
 define('ACL_ADMINISTRATOR', 6);
 
 /**
+ * Niveau d'accès pour les administrateurs technique
+ */
+define('ACL_SYSADMIN', 7);
+
+/**
  * Menus par défaut
  */
 $menu = array();
@@ -123,6 +128,10 @@ $menu['DEFAULT'] = array(
                 'label' => 'Mailling list',
                 'url' => 'ml',
             ),
+            'MAIL' => array(
+                'label' => 'Boites mails',
+                'url' => 'mails',
+            ),
             'MODELS' => array(
                 'label' => 'Instances de donnée',
                 'url' => 'admin_modeles',
@@ -177,6 +186,8 @@ function aclFromText($txt) {
         return ACL_SUPERUSER;
     if ($txt == "ADMINISTRATOR")
         return ACL_ADMINISTRATOR;
+    if ($txt == "SYSADMIN")
+        return ACL_SYSADMIN;
     throw new Exception("ACL not valid: " . $txt);
 }
 
