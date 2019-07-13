@@ -7,3 +7,6 @@
 /src/libs/card_bg.*
 /tmp/*.cache
 /PHPDocFill.html
+/src/configs/saml/
+
+!.gitkeep

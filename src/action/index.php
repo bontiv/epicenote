@@ -49,17 +49,17 @@ function _index_inscrip() {
         array(
         ),
     );
-    
+
     if ($step == 4) {
         redirect('index', 'inscrip');
     }
-    
+
     if (isset($_POST) && $usr->modFrom($_POST, $fields[$step])) {
         $step++;
     } elseif (!isset($_POST) || count($_POST) > 0) {
         $tpl->assign('hsuccess', 'Erreur de saisie');
     }
-    
+
     if ($step == 3 && $usr->user_type->ut_name == "EXTERNE") {
         $step++;
     }
@@ -107,7 +107,7 @@ function index_index() {
     if (hasAcl(ACL_GUEST) && $_SESSION['user']['user_role'] == 'GUEST' || isset($_GET['step']) && $_GET['step'] <= 4) {
         _index_inscrip();
     }
-    
+
     if (hasAcl(ACL_ADMINISTRATOR)) {
         $ago = $pdo->prepare("SELECT COUNT(*) FROM mandate WHERE DATE_ADD(NOW(), INTERVAL 45 DAY) < mandate_end ");
         $ago->execute();
@@ -128,7 +128,20 @@ function index_index() {
  * @global type $pdo
  */
 function index_login() {
-    global $tpl;
+    global $tpl, $config;
+
+    if ($config['cms']['saml']) {
+        $auth = new \OneLogin\Saml2\Auth();
+        if (isset($_REQUEST['redirect'])) {
+            $opts = explode('/', $_REQUEST['redirect']);
+            $command = http_build_query(array('action' => $opts[0], 'page' => $opts[1]));
+            $url = "${_SERVER['REQUEST_SCHEME']}://${_SERVER['HTTP_HOST']}${_SERVER['SCRIPT_NAME']}?${command}&${opts[2]}";
+            $auth->login($url);
+        } else {
+            $auth->login();
+        }
+        return;
+    }
 
     $tpl->assign('msg', false);
 
@@ -174,12 +187,17 @@ function index_login() {
  * @global type $tpl
  */
 function index_logout() {
-    global $tpl;
+    global $tpl, $config;
 
-    $_SESSION['user'] = false;
-    unset($_SESSION['user']);
-    $_SESSION = array();
-    redirect('index');
+    if ($config['cms']['saml']) {
+        $auth = new \OneLogin\Saml2\Auth();
+        $auth->logout();
+    } else {
+        $_SESSION['user'] = false;
+        unset($_SESSION['user']);
+        $_SESSION = array();
+        redirect('index');
+    }
 }
 
 /**
@@ -273,7 +291,7 @@ function _index_create_testmail($email) {
     global $srcdir, $config;
 
     require_once $srcdir . '/libs/phpmailer/class.smtp.php';
-    
+
     if ($config['PHPMailer']['enable'] == 'no') {
         return true;
     }

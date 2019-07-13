@@ -1,0 +1,21 @@
+{
+    "name": "epitanime/test-bot",
+    "description": "Test composer for Epitanime Intranet",
+    "type": "project",
+    "require": {
+        "onelogin/php-saml": "*"
+    },
+    "authors": [
+        {
+            "name": "Bontiv",
+            "email": "prog.bontiv@gmail.com"
+        }
+    ],
+    "support": {
+        "source": "https://dev.epitanime.com/technique/intranet",
+        "issues": "https://dev.epitanime.com/technique/intranet/issues"
+    },
+    "config": {
+        "vendor-dir": "src/vendor"
+    }
+}

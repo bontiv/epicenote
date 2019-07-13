@@ -55,6 +55,8 @@ require_once $root . 'libs' . DS . 'phpmailer' . DS . 'class.phpmailer.php';
 //Initialisation du captcha
 require_once $root . 'libs' . DS . 'securimage' . DS . 'securimage.php';
 
+require_once $root . 'vendor' . DS . 'autoload.php';
+
 //Initialisation du PDO
 $pdo = new PDO($dsn, $db_user, $db_pass);
 
@@ -70,6 +72,10 @@ $tpl->template_dir = $root . 'templates';
 $tpl->registerPlugin('function', 'mkurl', 'mkurl_smarty');
 $tpl->registerPlugin('function', 'mkmenu', 'mkmenu_smarty');
 $tpl->registerPlugin('block', 'acl', 'acl_smarty');
+
+// SSO parameters
+define("ONELOGIN_CUSTOMPATH", $srcdir . DIRECTORY_SEPARATOR . 'configs' . DIRECTORY_SEPARATOR . 'saml' . DIRECTORY_SEPARATOR);
+
 
 if (!is_dir($tpl->compile_dir))
     @mkdir($tpl->compile_dir, 0777);
@@ -95,6 +101,9 @@ while ($dat = $conf->fetch()) {
     $config[$parts[0]][$parts[1]] = $dat['value'];
 }
 
+// Set SAML login configuration
+$config['cms']['saml'] = file_exists(ONELOGIN_CUSTOMPATH . 'settings.php');
+
 //CSRF Whitelist
 $CSRF_withelist = array(
     'index' => array(
@@ -110,7 +119,7 @@ $CSRF_withelist = array(
 );
 
 //Etapes seulement si HTTP
-if (!CONSOLE) {
+if (!CONSOLE && !defined("CUSTOM")) {
 
 
     if (!isset($action)) {
