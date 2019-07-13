@@ -35,3 +35,7 @@ body {
 .form-hours {
     width: 80px;
 }
+
+.navbar {
+    z-index: 998;
+}

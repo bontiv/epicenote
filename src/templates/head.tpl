@@ -24,6 +24,18 @@
     </head>
 
     <body>
+    <script src="https://browser.sentry-cdn.com/5.5.0/bundle.min.js" crossorigin="anonymous"></script>
+    {if isset($sentry_dsn) }
+        <script type="text/javascript">
+            Sentry.init({ dsn: '{$sentry_dsn}' });
+        </script>
+
+        {if isset($sentry_event) }
+            <script>
+                Sentry.showReportDialog({ eventId: '{$sentry_event}' })
+            </script>
+        {/if}
+    {/if}
 
         <div class="navbar navbar-default" role="navigation">
             <div class="container">

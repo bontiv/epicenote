@@ -39,6 +39,10 @@ function syscore_autoload($page) {
             $tpl->assign('msg', 'Erreur inconnu : ' . $page);
             break;
     }
+
+    if (Sentry\State\Hub::getCurrent()->getLastEventId()) {
+        $tpl->assign('sentry_event', Sentry\State\Hub::getCurrent()->getLastEventId());
+    }
     $tpl->display('syscore_error.tpl');
     quit();
 }

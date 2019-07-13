@@ -101,6 +101,25 @@ while ($dat = $conf->fetch()) {
     $config[$parts[0]][$parts[1]] = $dat['value'];
 }
 
+// Load Sentry
+if ($config['cms']['sentry_back'] != "") {
+    Sentry\init([
+        'dsn' => $config['cms']['sentry_back'],
+        'environment' => $config['cms']['sentry_environment'],
+    ]);
+    $tpl->assign('sentry_dsn', $config['cms']['sentry_back']);
+
+    if (isset($_SESSION['user']) && $_SESSION['user'] !== false) {
+        Sentry\configureScope(function (Sentry\State\Scope $scope): void {
+            $scope->setUser([
+                'id' => $_SESSION['user']['user_id'],
+                'email' => $_SESSION['user']['user_email'],
+                'username' => $_SESSION['user']['user_name'],
+            ]);
+        });
+    }
+}
+
 // Set SAML login configuration
 $config['cms']['saml'] = file_exists(ONELOGIN_CUSTOMPATH . 'settings.php');
 
@@ -166,6 +185,8 @@ if (!CONSOLE && !defined("CUSTOM")) {
 
     // Etape 4 lancement du module
     modexec($action, $page);
+    $error = new CoreException("Module error", $action, $page);
+    \Sentry\captureException($error);
     modexec('syscore', 'moderror');
     quit();
 }

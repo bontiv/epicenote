@@ -9,7 +9,7 @@ deploy:
         - composer install
         - rm -rf $PROJECT_SRCDIR/*
         - cp -r * $PROJECT_SRCDIR
-        - cp -r $PROJECT_SRCDIR/../keep/ $PROJECT_SRCDIR
+        - cp -rv $PROJECT_SRCDIR/../keep/ $PROJECT_SRCDIR/
         - cp -r htdocs/* $PROJECT_HTTPDIR
     environment:
         name: production

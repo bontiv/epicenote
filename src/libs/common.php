@@ -225,14 +225,31 @@ function hasAcl($acl, $action = null, $page = 'index', $params = null) {
     return $user >= $acl;
 }
 
+class ForbiddenException extends \Exception {
+    public $action;
+    public $page;
+
+    function __construct($action = null, $page = null, $message = "Forbidden Page", $code = 403, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+        $this->action = $action;
+        $this->page = $page;
+    }
+}
+
 /**
  * Affiche une page d'erreur si le niveau d'accès de l'utilisateur
  * est trop faible
  * @param type $acl
  */
 function needAcl($acl, $action = null, $page = null, $params = null) {
-    if (!hasAcl($acl, $action, $page, $params))
+    if (!hasAcl($acl, $action, $page, $params)) {
+
+        $error = new ForbiddenException($action, $page);
+
+        Sentry\captureException($error);
         modexec('syscore', 'forbidden');
+    }
 }
 
 /**
@@ -511,6 +528,18 @@ function modsecu($action, $page = 'index', $params = null) {
     return false;
 }
 
+class CoreException extends \Exception {
+    public $action = "";
+    public $page = "";
+
+    function __construct($message = "", $action = null, $page = null, $code = 400, Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+        $this->page = $page != null ? $page : $GLOBALS['page'];
+        $this->action = $action != null ? $action : $GLOBALS['action'];
+    }
+}
+
 /**
  * Execute un controleur
  * @global type $root
@@ -542,6 +571,8 @@ function modexec($action, $page = 'index') {
     }
 
     if ($exec == false) {
+        $error = new CoreException("Page not found", $action, $page);
+        \Sentry\captureException($error);
         modexec('syscore', 'nopage');
     }
 }
@@ -796,6 +827,11 @@ function dbg_warning($file, $msg, $pile = 0) {
 function display() {
     global $tpl, $exec_mod, $exec_action, $exec_extend;
 
+    if (Sentry\State\Hub::getCurrent()->getLastEventId()) {
+        $tpl->assign('sentry_event', Sentry\State\Hub::getCurrent()->getLastEventId());
+    }
+
+
     if (!$exec_extend) {
         $tpl->display($exec_mod . '_' . $exec_action . '.tpl');
     } else {
@@ -1009,6 +1045,8 @@ function run($action = null, $page = null) {
     modsecu($action, $page, $_GET);
     needAcl(getAclLevel($action, $page), $action, $page, $_GET);
     modexec($action, $page);
+    $error = new CoreException("Module not executed (run break)", $action, $page);
+    \Sentry\captureException($error);
     modexec('syscore', 'moderror');
     quit();
 }
