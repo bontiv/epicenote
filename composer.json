@@ -3,7 +3,8 @@
     "description": "Test composer for Epitanime Intranet",
     "type": "project",
     "require": {
-        "onelogin/php-saml": "*"
+        "onelogin/php-saml": "*",
+        "sentry/sdk": "2.0.2"
     },
     "authors": [
         {

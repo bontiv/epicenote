@@ -13,3 +13,12 @@ fields:
         type: int
         label: Nombre de jours depuis la dernière connexion d'un utilisateur avant suppression des données personnelles.
         default: 730
+    sentry_back:
+        type: var
+        size: 150
+        label: Clé Sentry privé (pour PHP)
+        default: ""
+    sentry_environment:
+        type: var
+        label: Environement du serveur (production)
+        default: testing

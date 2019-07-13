@@ -693,5 +693,8 @@ function index_password_change() {
 function index_error403() {
     header("HTTP/1.1 403 Unauthorized");
 
+    $error = new ForbiddenException(null, null, "From: ${_SERVER['HTTP_REFERER']}");
+    \Sentry\captureException($error);
+
     display();
 }
