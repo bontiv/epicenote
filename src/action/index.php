@@ -419,7 +419,7 @@ function index_profile() {
     display();
 }
 
-function index_print() {
+function index_print($user = null, $subscription = null) {
     global $root, $srcdir, $tmpdir;
 
     include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'fpdf.php';
@@ -436,9 +436,9 @@ function index_print() {
         dbg_error(__FILE__, 'Mandat non actif');
     }
     $sub = new Modele('subscription');
-    $sub->fetch($_POST['subscription']);
+    $sub->fetch($subscription !== null ? $subscription : $_POST['subscription']);
     $usr = new Modele('users');
-    $usr->fetch($_SESSION['user']['user_id']);
+    $usr->fetch($user !== null ? $user : $_SESSION['user']['user_id']);
     $sublist = new Modele('subscription');
     //$sublist->find(array('subscription_mandate' => $mdt->mandate_id));
     $sublist->find(array(

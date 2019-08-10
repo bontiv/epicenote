@@ -542,9 +542,10 @@ class CoreException extends \Exception {
 
 /**
  * Execute un controleur
- * @global type $root
  * @param type $action
- * @param type $page
+ * @param string $page
+ * @param null $args
+ * @global type $root
  */
 function modexec($action, $page = 'index') {
     global $root, $exec_mod, $exec_action, $exec_extend;
@@ -566,7 +567,8 @@ function modexec($action, $page = 'index') {
     if (function_exists($action . '_' . $page)) {
         $exec_mod = $action;
         $exec_action = $page;
-        call_user_func($action . '_' . $page);
+        $args = array_slice(func_get_args(), 2);
+        call_user_func_array($action . '_' . $page, $args);
         $exec = true;
     }
 

@@ -49,6 +49,47 @@
 </form>
 {/if}
 
+<form action="{mkurl action="user" page="print" user=$user.user_id}" method="POST">
+    <div class="modal fade" id="member" tabindex="-1" role="dialog" aria-labelledby="Member print" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Fiche de membre</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Séléctionnez le mandat et type de cotisation.</p>
+
+                    <!-- List mandate -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="mandate">Mandat</label>
+                        <div class="col-md-8">
+                            <p class="form-control-static">{$mandate->mandate_label}</p>
+                        </div>
+                    </div>
+
+                    <!-- List cotisation -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="subscription">Type de cotisation</label>
+                            <select id="subscription" name="subscription" class="form-control input-md">
+                                {foreach $subs as $sub}
+                                    <option value="{$sub->getKey()}">{$sub->subscription_label}</option>
+                                {/foreach}
+                            </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-12">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Imprimer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
 <h1>Utilisateurs</h1>
 <h2>{$user.user_name|escape}</h2>
 
@@ -67,6 +108,10 @@
             <strong>Accès : </strong>{$user.user_role}<br />
             {if isset($audit)}<strong>Dernier accès : </strong>{$audit.la_date|date_format:"%d/%m/%y %H:%M"} ({$audit.la_ip})<br />{/if}
         </p>
+
+        <button type="button" href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#member">
+            <i class="glyphicon glyphicon-print"></i> Fiche membre
+        </button>
 
         {if not $saml}
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#passwordRecover">

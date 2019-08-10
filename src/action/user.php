@@ -256,7 +256,7 @@ function user_view() {
         $sections[] = $line['section_id'];
         $tpl->append('sections', $line);
     }
-    
+
     //Last connection
     $lstConnect = $pdo->prepare('SELECT la_date, la_ip FROM logaudit WHERE la_user = ? AND la_type = "ACCEPT" ORDER BY la_date DESC LIMIT 1');
     $lstConnect->bindValue(1, $user['user_id']);
@@ -265,6 +265,19 @@ function user_view() {
     if ($audit) {
         $tpl->assign('audit', $audit);
     }
+
+    //Member paper form print
+    $mdt = new Modele('mandate');
+    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now() and mandate_state = "ACTIVE"', 'mandate_ago DESC')) {
+        if ($mdt->next()) {
+            $mdt->assignTemplate('mandate');
+            $sub = new Modele('subscription');
+            $sub->find(array('subscription_mandate' => $mdt->getKey()));
+            $sub->appendTemplate('subs');
+        }
+    }
+    // <end> Member paper form print
+
 
     //List events
     $sql = $pdo->prepare('SELECT * FROM event_staff'
@@ -578,4 +591,15 @@ function user_pdfex() {
     $pdf->out();
 
     quit();
+}
+
+function user_print() {
+    $acl = new Modele('logaudit');
+    $acl->addFrom([
+        'la_user' => $_GET['user'],
+        'la_date' => date('Y-m-d H:i:s'),
+        'la_type' => 'ACCEPT',
+        'la_ip' => '0.0.0.0',
+    ]);
+    modexec('index', 'print', $_GET['user'], $_POST['subscription']);
 }
