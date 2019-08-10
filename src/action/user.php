@@ -460,7 +460,11 @@ function user_check() {
 }
 
 function user_editpassword() {
-    global $tpl;
+    global $tpl, $config;
+
+    if ($config['cms']['saml']) {
+        throw new Exception('SAML is activated. Legacy system not available.');
+    }
 
     $pass = $_POST['password'];
     $confirm = $_POST['password2'];

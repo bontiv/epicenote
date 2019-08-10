@@ -332,9 +332,23 @@ function index_inscrip() {
  * @global type $tpl
  */
 function index_profile() {
-    global $tpl, $srcdir, $pdo;
+    global $tpl, $srcdir, $pdo, $config;
 
     $mdl = new Modele('users');
+    $fieldset = [
+    'user_name',
+        'user_firstname',
+        'user_lastname',
+        'user_sexe',
+        'user_born',
+        'user_type',
+        'user_promo',
+        'user_login',
+        'user_phone',
+        'user_address',
+        'user_town',
+        'user_cp',
+    ];
 
     $mdl->fetch($_SESSION['user']['user_id']);
 
@@ -348,6 +362,10 @@ function index_profile() {
     }
 
     if (isset($_POST['editpass'])) {
+        if ($config['cms']['saml']) {
+            throw new Exception('SAML is activated. Legacy system not available.');
+        }
+
         if ($_POST['pwd1'] == '' || $_POST['oldpass'] != md5($_SESSION['user']['user_pass'] . $_SESSION['random'])) {
             $tpl->assign('hsuccess', false);
         } else {
@@ -375,7 +393,7 @@ function index_profile() {
     $_SESSION['random'] = md5(uniqid('epicenote'));
     $tpl->assign('random', $_SESSION['random']);
     $tpl->assign('isMember', hasAcl(ACL_USER));
-    $tpl->assign('form', $mdl->edit());
+    $tpl->assign('form', $mdl->edit($fieldset));
     $tpl->assign('completed', hasAcl(ACL_CPLUSER));
 
     $mdl = new Modele('card');
@@ -624,7 +642,12 @@ function index_securimage_show() {
 }
 
 function index_password() {
-    global $tpl;
+    global $tpl, $config;
+
+    if ($config['cms']['saml']) {
+        throw new Exception('SAML is activated. Legacy system not available.');
+    }
+
 
     if (isset($_POST['valider'])) {
         $securimage = new Securimage();
@@ -663,7 +686,12 @@ function index_password() {
 }
 
 function index_password_change() {
-    global $tpl;
+    global $tpl, $config;
+
+
+    if ($config['cms']['saml']) {
+        throw new Exception('SAML is activated. Legacy system not available.');
+    }
 
     if (!isset($_GET['valid']) || $_GET['valid'] != $_SESSION['index_password_code']) {
         $tpl->assign('hsuccess', false);

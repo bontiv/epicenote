@@ -34,11 +34,13 @@
 </div><!-- /.modal -->
 
 <ul class="nav nav-pills" role="tablist">
-  <li class="{if $smarty.get.page == 'profile'}active{/if}"><a href="#edit" role="tablist" data-toggle="pill">Profile</a></li>
-  <li class=""><a href="#password" role="tablist" data-toggle="pill">Mot de passe</a></li>
-  <li class=""><a href="#card" role="tablist" data-toggle="pill">Carte de membre</a></li>
-  <li class="{if $smarty.get.page == 'inscrip'}active{/if}"><a href="#print" role="tablist" data-toggle="pill">Fiche de membre</a></li>
-  <li class=""><a href="#2factors" role="tablist" data-toggle="pill">Google Authenticator</a></li>
+  <li class="{if $smarty.get.page == 'profile'}active{/if}"><a href="#edit" role="tablist" data-toggle="pill">1. Profile</a></li>
+  <li class="{if $smarty.get.page == 'inscrip'}active{/if}"><a href="#print" role="tablist" data-toggle="pill">2. Fiche d'inscription membre</a></li>
+  <li class=""><a href="#card" role="tablist" data-toggle="pill">3. Carte de membre</a></li>
+  {if not $saml}
+    <li class=""><a href="#password" role="tablist" data-toggle="pill">Mot de passe</a></li>
+    <li class=""><a href="#2factors" role="tablist" data-toggle="pill">Google Authenticator</a></li>
+  {/if}
 </ul>
 
 <div class="pill-content">
@@ -60,6 +62,7 @@
     </form>
   </div>
 
+{if not $saml}
   <div class="pill-pane" id="password">
     <form class="form-horizontal" method="POST" onsubmit="return crypt(this)">
       <fieldset>
@@ -105,6 +108,7 @@
       </fieldset>
     </form>
   </div>
+{/if}
 
   <div class="pill-pane" id="card">
     <h2>Edition des cartes de membre</h2>
@@ -273,6 +277,7 @@
     {/if}
   </div>
 
+  {if not $saml}
   <div class="pill-pane" id="2factors">
 
     {if $smarty.session.user.user_otp}
@@ -357,5 +362,6 @@
       </fieldset>
     </form>
   </div>
+  {/if}
 </div>
 {include "foot.tpl"}

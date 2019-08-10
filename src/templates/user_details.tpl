@@ -20,7 +20,7 @@
 </div><!-- /.modal -->
 
 
-
+{if not $saml}
 <!-- Modal passwordRecover -->
 <form action="{mkurl action="user" page="editpassword" user=$user.user_id}" method="POST">
     <div class="modal fade" id="passwordRecover" tabindex="-1" role="dialog" aria-labelledby="Password Recover" aria-hidden="true">
@@ -47,6 +47,7 @@
         </div>
     </div>
 </form>
+{/if}
 
 <h1>Utilisateurs</h1>
 <h2>{$user.user_name|escape}</h2>
@@ -67,10 +68,11 @@
             {if isset($audit)}<strong>Dernier accès : </strong>{$audit.la_date|date_format:"%d/%m/%y %H:%M"} ({$audit.la_ip})<br />{/if}
         </p>
 
-
+        {if not $saml}
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#passwordRecover">
             <i class="glyphicon glyphicon-edit"></i> Mot de passe
         </button>
+        {/if}
     </div>
     <div class="col-lg-6">
         {if $user.user_photo != ""}
