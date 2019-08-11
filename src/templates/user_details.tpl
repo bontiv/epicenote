@@ -113,6 +113,8 @@
             <i class="glyphicon glyphicon-print"></i> Fiche membre
         </button>
 
+        <a class="btn btn-info" href="{mkurl action="user" page="edit" user=$user.user_id}">Editer</a>
+
         {if $user.user_role != "ADMINISTRATOR" and $user.user_role != "SYSADMIN"}
         <form method="POST" action="{mkurl action="admin" page="add"}">
             <input type="hidden" value="{$user.user_name}" name="addadmin">

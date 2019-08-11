@@ -630,3 +630,35 @@ function user_print() {
     ]);
     modexec('index', 'print', $_GET['user'], $_POST['subscription']);
 }
+
+function user_edit() {
+    global $tpl;
+
+    $usr = new Modele('users');
+    $usr->fetch($_GET['user']);
+    $usr->assignTemplate('user');
+
+    $fieldset = [
+        'user_name',
+        'user_firstname',
+        'user_lastname',
+        'user_type',
+        'user_login',
+        'user_promo',
+        'user_email',
+        'user_phone',
+        'user_address',
+        'user_cp',
+        'user_town',
+        'user_sexe',
+        'user_born',
+        'user_role',
+    ];
+
+    if (isset($_POST['user_name'])) {
+        redirect('user', 'view', ['user' => $usr->getKey(), 'hsuccess' => $usr->modFrom($_POST, $fieldset) ? '1' : '0']);
+    }
+
+    $tpl->assign('fieldset', $fieldset);
+    display();
+}
