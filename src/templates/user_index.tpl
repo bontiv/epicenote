@@ -89,24 +89,46 @@
     <h1>Administration</h1>
     <h3>Gestion des utilisateurs</h3>
 
+    {* START BLOCK actions *}
+    <div class="row-fluid">
+    <a class="btn btn-link" href="{mkurl action="user" page="add"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus"></i> Ajouter</a>
+    <a class="btn btn-link" href="{mkurl action="user" page="check"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-check" title="Valider des cotisations"></i> Valider</a>
+    <a class="btn btn-link" href="#" role="button" data-toggle="modal" data-target="#ExportPDF"><i class="glyphicon glyphicon-share" title="Exporter en PDF"></i> Export PDF</a>
+    <a class="btn btn-link" href="{mkurl action="user" page="sync2"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-export"></i> GoogleSync</a>
+    <a class="btn btn-link" href="{mkurl action="user" page="remove_old"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i> Retrait anciens</a>
+    </div>
+    {* END BLOCK actions *}
+
     {* START BLOCK recherche *}
     <form class="form-inline" method="POST" action="{mkurl action="user" page="index"}">
         <fieldset>
             <div class="form-group">
-                <div class="col-md-8">
-                    <input id="search" name="search" placeholder="Recherche" class="form-control input-md"  type="search">
-                </div>
+                    <input id="search" name="search" placeholder="Recherche" class="form-control input-md" type="search"{if isset($smarty.get.search)} value="{$smarty.get.search}"{/if}>
+            </div>
+            <div class="form-group">
+                    <select class="form-control" name="role" onchange="this.form.submit()">
+                        <option class="text-muted" value="">Pas de filtre</option>
+                        <optgroup label="Non membres">
+                            <option value="GUEST,CPLUSER" {if $smarty.get.role == "GUEST,CPLUSER"}selected{/if}>Tous les non membres</option>
+                            <option value="GUEST" {if $smarty.get.role == "GUEST"}selected{/if}>Profil incomplet</option>
+                            <option value="CPLUSER" {if $smarty.get.role == "CPLUSER"}selected{/if}>Profil complet</option>
+                        </optgroup>
+                        <optgroup label="Membres">
+                            <option value="USER,ADMINISTRATOR,SYSADMIN" {if $smarty.get.role == "USER,ADMINISTRATOR,SYSADMIN"}selected{/if}>Tous membres et assimilés</option>
+                            <option value="SUBSCRIPTION" {if $smarty.get.role == "SUBSCRIPTION"}selected{/if}>Dernier mandat actif</option>
+                            <option value="ADMINISTRATOR,SYSADMIN" {if $smarty.get.role == "ADMINISTRATOR,SYSADMIN"}selected{/if}>Administrateurs</option>
+                            <option value="SYSADMIN" {if $smarty.get.role == "SYSADMIN"}selected{/if}>Administrateurs système</option>
+                        </optgroup>
+                    </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary">Rechercher</button>
             </div>
         </fieldset>
     </form>
     {* END BLOCK *}
 
 
-    <a class="btn btn-link" href="{mkurl action="user" page="add"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-plus"></i> Ajouter</a>
-    <a class="btn btn-link" href="{mkurl action="user" page="check"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-check" title="Valider des cotisations"></i> Valider</a>
-    <a class="btn btn-link" href="#" role="button" data-toggle="modal" data-target="#ExportPDF"><i class="glyphicon glyphicon-share" title="Exporter en PDF"></i> Export PDF</a>
-    <a class="btn btn-link" href="{mkurl action="user" page="sync2"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-export"></i> GoogleSync</a>
-    <a class="btn btn-link" href="{mkurl action="user" page="remove_old"}" role="button" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i> Retrait anciens</a>
     <ul class="pager">
         {if $ptable.showPrev}
             <li><a href="{$ptable.prev}"><i class="glyphicon glyphicon-arrow-left"></i> Précédent</a></li>

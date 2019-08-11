@@ -166,7 +166,7 @@ function user_index() {
     global $pdo, $tpl;
 
     if (isset($_POST['search'])) {
-        redirect('user', 'index', array('search' => $_POST['search']));
+        redirect('user', 'index', array('search' => $_POST['search'], 'role' => $_POST['role']));
     }
 
     $mdt = new Modele('mandate');
@@ -175,21 +175,48 @@ function user_index() {
 
 
     $where = 'WHERE user_status != "DELETE"';
+    $mandate = false;
 
     if (isset($_GET['search'])) {
-        $where .= ' AND (user_name LIKE ? '
-                . 'OR user_lastname LIKE ? '
-                . 'OR user_firstname LIKE ? '
-                . 'OR user_email LIKE ? )';
+        $where .= ' AND (user_name LIKE :search '
+                . 'OR user_lastname LIKE :search '
+                . 'OR user_firstname LIKE :search '
+                . 'OR user_email LIKE :search )';
+
+        if (strlen($_GET['role']) > 0) {
+            $where .= ' AND (';
+            $first = true;
+            foreach (explode(',', $_GET['role']) as $filter) {
+                if ($first) {
+                    $first = false;
+                } else {
+                    $where .= ' OR';
+                }
+                if (in_array($filter, ['GUEST', 'CPLUSER', 'USER', 'ADVUSER', 'SUPERUSER', 'ADMINISTRATOR', 'SYSADMIN'])) {
+                    $where .= " user_role = '$filter'";
+                } elseif ($filter == 'SUBSCRIPTION') {
+                    $where .= " 1 = (SELECT COUNT(*) FROM user_mandate WHERE um_user = user_id AND um_mandate = :mandate)";
+                    $mandate = true;
+                }
+            }
+            $where .= ')';
+        }
     }
+
 
     $pager = new SimplePager('users', $where . 'ORDER BY user_name ASC', 'p', 20);
 
     if (isset($_GET['search'])) {
-        $pager->bindValue(1, "%${_GET['search']}%");
-        $pager->bindValue(2, "%${_GET['search']}%");
-        $pager->bindValue(3, "%${_GET['search']}%");
-        $pager->bindValue(4, "%${_GET['search']}%");
+        $pager->bindValue('search', "%${_GET['search']}%");
+    }
+    if ($mandate) {
+        $mandate = new Modele('mandate');
+        $mandate->find(['mandate_state' => 'ACTIVE'], 'mandate_start DESC');
+        if ($mandate->next()) {
+            $pager->bindValue('mandate', $mandate->getKey());
+        } else {
+            $pager->bindValue('mandate', 0);
+        }
     }
 
     $pager->run($tpl);
