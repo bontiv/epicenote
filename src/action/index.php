@@ -332,9 +332,20 @@ function index_inscrip() {
  * @global type $tpl
  */
 function index_profile() {
-    global $tpl, $srcdir, $pdo;
+    global $tpl, $srcdir, $pdo, $config;
 
     $mdl = new Modele('users');
+    $fieldset = [
+        'user_sexe',
+        'user_born',
+        'user_type',
+        'user_promo',
+        'user_login',
+        'user_phone',
+        'user_address',
+        'user_town',
+        'user_cp',
+    ];
 
     $mdl->fetch($_SESSION['user']['user_id']);
 
@@ -342,12 +353,16 @@ function index_profile() {
         if (strtolower(strrchr($_POST['user_email'], "@")) == "@epitanime.com") {
             $tpl->assign('error', "L'adresse email n'est pas valide.");
         } else {
-            $tpl->assign('hsuccess', $mdl->modFrom($_POST));
+            $tpl->assign('hsuccess', $mdl->modFrom($_POST, $fieldset));
             $mdl->user_hmail = md5(strtolower($mdl->user_email));
         }
     }
 
     if (isset($_POST['editpass'])) {
+        if ($config['cms']['saml']) {
+            throw new Exception('SAML is activated. Legacy system not available.');
+        }
+
         if ($_POST['pwd1'] == '' || $_POST['oldpass'] != md5($_SESSION['user']['user_pass'] . $_SESSION['random'])) {
             $tpl->assign('hsuccess', false);
         } else {
@@ -375,7 +390,7 @@ function index_profile() {
     $_SESSION['random'] = md5(uniqid('epicenote'));
     $tpl->assign('random', $_SESSION['random']);
     $tpl->assign('isMember', hasAcl(ACL_USER));
-    $tpl->assign('form', $mdl->edit());
+    $tpl->assign('form', $mdl->edit($fieldset));
     $tpl->assign('completed', hasAcl(ACL_CPLUSER));
 
     $mdl = new Modele('card');
@@ -401,7 +416,7 @@ function index_profile() {
     display();
 }
 
-function index_print() {
+function index_print($user = null, $subscription = null) {
     global $root, $srcdir, $tmpdir;
 
     include_once $srcdir . DS . 'libs' . DS . 'fpdf' . DS . 'fpdf.php';
@@ -418,9 +433,9 @@ function index_print() {
         dbg_error(__FILE__, 'Mandat non actif');
     }
     $sub = new Modele('subscription');
-    $sub->fetch($_POST['subscription']);
+    $sub->fetch($subscription !== null ? $subscription : $_POST['subscription']);
     $usr = new Modele('users');
-    $usr->fetch($_SESSION['user']['user_id']);
+    $usr->fetch($user !== null ? $user : $_SESSION['user']['user_id']);
     $sublist = new Modele('subscription');
     //$sublist->find(array('subscription_mandate' => $mdt->mandate_id));
     $sublist->find(array(
@@ -624,7 +639,12 @@ function index_securimage_show() {
 }
 
 function index_password() {
-    global $tpl;
+    global $tpl, $config;
+
+    if ($config['cms']['saml']) {
+        throw new Exception('SAML is activated. Legacy system not available.');
+    }
+
 
     if (isset($_POST['valider'])) {
         $securimage = new Securimage();
@@ -663,7 +683,12 @@ function index_password() {
 }
 
 function index_password_change() {
-    global $tpl;
+    global $tpl, $config;
+
+
+    if ($config['cms']['saml']) {
+        throw new Exception('SAML is activated. Legacy system not available.');
+    }
 
     if (!isset($_GET['valid']) || $_GET['valid'] != $_SESSION['index_password_code']) {
         $tpl->assign('hsuccess', false);

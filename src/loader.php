@@ -122,6 +122,7 @@ if ($config['cms']['sentry_back'] != "") {
 
 // Set SAML login configuration
 $config['cms']['saml'] = file_exists(ONELOGIN_CUSTOMPATH . 'settings.php');
+$tpl->assign('saml', $config['cms']['saml']);
 
 //CSRF Whitelist
 $CSRF_withelist = array(

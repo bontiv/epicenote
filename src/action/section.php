@@ -634,3 +634,22 @@ function section_trombi() {
 
     display();
 }
+
+function section_staff_add() {
+    $section = $_GET['section'];
+    $staff = $_POST['login'];
+
+    $usr = new Modele('users');
+    $usr->find(['user_name' => $staff]);
+    if ($usr->next()) {
+        $user_section = new Modele('user_sections');
+        $user_section->addFrom([
+            'us_section' => $section,
+            'us_user' => $usr->getKey(),
+            'us_type' => 'manager',
+        ]);
+        redirect('section', 'details', ['section' => $section, 'hsuccess' => 1]);
+    } else {
+        redirect('section', 'details', ['section' => $section, 'hsuccess' => 0]);
+    }
+}

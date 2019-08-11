@@ -20,7 +20,7 @@
 </div><!-- /.modal -->
 
 
-
+{if not $saml}
 <!-- Modal passwordRecover -->
 <form action="{mkurl action="user" page="editpassword" user=$user.user_id}" method="POST">
     <div class="modal fade" id="passwordRecover" tabindex="-1" role="dialog" aria-labelledby="Password Recover" aria-hidden="true">
@@ -47,6 +47,48 @@
         </div>
     </div>
 </form>
+{/if}
+
+<form action="{mkurl action="user" page="print" user=$user.user_id}" method="POST">
+    <div class="modal fade" id="member" tabindex="-1" role="dialog" aria-labelledby="Member print" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Fiche de membre</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Séléctionnez le mandat et type de cotisation.</p>
+
+                    <!-- List mandate -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="mandate">Mandat</label>
+                        <div class="col-md-8">
+                            <p class="form-control-static">{$mandate->mandate_label}</p>
+                        </div>
+                    </div>
+
+                    <!-- List cotisation -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="subscription">Type de cotisation</label>
+                            <select id="subscription" name="subscription" class="form-control input-md">
+                                {foreach $subs as $sub}
+                                    <option value="{$sub->getKey()}">{$sub->subscription_label}</option>
+                                {/foreach}
+                            </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-12">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Imprimer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
 
 <h1>Utilisateurs</h1>
 <h2>{$user.user_name|escape}</h2>
@@ -67,10 +109,28 @@
             {if isset($audit)}<strong>Dernier accès : </strong>{$audit.la_date|date_format:"%d/%m/%y %H:%M"} ({$audit.la_ip})<br />{/if}
         </p>
 
+        <button type="button" href="" class="btn btn-default btn-sm" data-toggle="modal" data-target="#member">
+            <i class="glyphicon glyphicon-print"></i> Fiche membre
+        </button>
 
+        <a class="btn btn-info" href="{mkurl action="user" page="edit" user=$user.user_id}">Editer</a>
+
+        {if $user.user_role != "ADMINISTRATOR" and $user.user_role != "SYSADMIN"}
+        <form method="POST" action="{mkurl action="admin" page="add"}">
+            <input type="hidden" value="{$user.user_name}" name="addadmin">
+            <button type="submit" class="btn btn-danger">
+                Mettre admin
+            </button>
+        </form>
+        {else}
+            <a href="{mkurl action="admin" page="remove" user=$user.user_id}" class="btn btn-default">Retirer droits admin</a>
+        {/if}
+
+        {if not $saml}
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#passwordRecover">
             <i class="glyphicon glyphicon-edit"></i> Mot de passe
         </button>
+        {/if}
     </div>
     <div class="col-lg-6">
         {if $user.user_photo != ""}

@@ -34,16 +34,39 @@
 </div><!-- /.modal -->
 
 <ul class="nav nav-pills" role="tablist">
-  <li class="{if $smarty.get.page == 'profile'}active{/if}"><a href="#edit" role="tablist" data-toggle="pill">Profile</a></li>
-  <li class=""><a href="#password" role="tablist" data-toggle="pill">Mot de passe</a></li>
-  <li class=""><a href="#card" role="tablist" data-toggle="pill">Carte de membre</a></li>
-  <li class="{if $smarty.get.page == 'inscrip'}active{/if}"><a href="#print" role="tablist" data-toggle="pill">Fiche de membre</a></li>
-  <li class=""><a href="#2factors" role="tablist" data-toggle="pill">Google Authenticator</a></li>
+  <li class="{if $smarty.get.page == 'profile'}active{/if}"><a href="#edit" role="tablist" data-toggle="pill">1. Profile</a></li>
+  <li class="{if $smarty.get.page == 'inscrip'}active{/if}"><a href="#print" role="tablist" data-toggle="pill">2. Fiche d'inscription membre</a></li>
+  <li class=""><a href="#card" role="tablist" data-toggle="pill">3. Carte de membre</a></li>
+  {if not $saml}
+    <li class=""><a href="#password" role="tablist" data-toggle="pill">Mot de passe</a></li>
+    <li class=""><a href="#2factors" role="tablist" data-toggle="pill">Google Authenticator</a></li>
+  {/if}
 </ul>
 
 <div class="pill-content">
   <div class="pill-pane{if $smarty.get.page == 'profile'} active{/if}" id="edit">
     <form method="POST" class="form-horizontal">
+
+      <legend>Vos informations</legend>
+
+      <div class="form-group">
+        <label class="col-md-4 control-label">Identifiant (pseudo)</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_name}</p></div>
+      </div>
+      <div class="form-group">
+        <label class="col-md-4 control-label">Nom</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_lastname}</p></div>
+      </div>
+      <div class="form-group">
+        <label class="col-md-4 control-label">Prénom</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_firstname}</p></div>
+      </div>
+      <div class="form-group">
+        <label class="col-md-4 control-label">Adresse email</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_email}</p></div>
+      </div>
+
+      <div class="text-muted col-md-offset-4">Rendez-vous sur <a href="https://account.epitanime.com/">votre interface de compte Epitanime</a> pour modifier ces informations.</div>
 
       <legend>Edition du profil</legend>
 
@@ -60,6 +83,7 @@
     </form>
   </div>
 
+{if not $saml}
   <div class="pill-pane" id="password">
     <form class="form-horizontal" method="POST" onsubmit="return crypt(this)">
       <fieldset>
@@ -105,6 +129,7 @@
       </fieldset>
     </form>
   </div>
+{/if}
 
   <div class="pill-pane" id="card">
     <h2>Edition des cartes de membre</h2>
@@ -273,6 +298,7 @@
     {/if}
   </div>
 
+  {if not $saml}
   <div class="pill-pane" id="2factors">
 
     {if $smarty.session.user.user_otp}
@@ -357,5 +383,6 @@
       </fieldset>
     </form>
   </div>
+  {/if}
 </div>
 {include "foot.tpl"}

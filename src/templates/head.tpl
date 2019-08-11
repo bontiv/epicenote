@@ -62,7 +62,8 @@
                                     {$_user.user_name|escape} <b class="caret"></b></a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                                     <li><a href="{mkurl action="index" page="logout"}">Déconnexion</a></li>
-                                    <li><a href="{mkurl action="index" page="profile"}">Mon profil</a></li>
+                                    <li><a href="{mkurl action="index" page="profile"}">Mon profil (informations personnelles)</a></li>
+                                    {if $saml}<li><a href="https://account.epitanime.com/">Mon compte (mot de passe / email)</a></li>{/if}
                                     <li><a href="{mkurl action="compta"}">Ma compta</a></li>
                                 </ul>
                             </li>

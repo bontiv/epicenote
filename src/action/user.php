@@ -166,7 +166,7 @@ function user_index() {
     global $pdo, $tpl;
 
     if (isset($_POST['search'])) {
-        redirect('user', 'index', array('search' => $_POST['search']));
+        redirect('user', 'index', array('search' => $_POST['search'], 'role' => $_POST['role']));
     }
 
     $mdt = new Modele('mandate');
@@ -175,21 +175,48 @@ function user_index() {
 
 
     $where = 'WHERE user_status != "DELETE"';
+    $mandate = false;
 
     if (isset($_GET['search'])) {
-        $where .= ' AND (user_name LIKE ? '
-                . 'OR user_lastname LIKE ? '
-                . 'OR user_firstname LIKE ? '
-                . 'OR user_email LIKE ? )';
+        $where .= ' AND (user_name LIKE :search '
+                . 'OR user_lastname LIKE :search '
+                . 'OR user_firstname LIKE :search '
+                . 'OR user_email LIKE :search )';
+
+        if (strlen($_GET['role']) > 0) {
+            $where .= ' AND (';
+            $first = true;
+            foreach (explode(',', $_GET['role']) as $filter) {
+                if ($first) {
+                    $first = false;
+                } else {
+                    $where .= ' OR';
+                }
+                if (in_array($filter, ['GUEST', 'CPLUSER', 'USER', 'ADVUSER', 'SUPERUSER', 'ADMINISTRATOR', 'SYSADMIN'])) {
+                    $where .= " user_role = '$filter'";
+                } elseif ($filter == 'SUBSCRIPTION') {
+                    $where .= " 1 = (SELECT COUNT(*) FROM user_mandate WHERE um_user = user_id AND um_mandate = :mandate)";
+                    $mandate = true;
+                }
+            }
+            $where .= ')';
+        }
     }
+
 
     $pager = new SimplePager('users', $where . 'ORDER BY user_name ASC', 'p', 20);
 
     if (isset($_GET['search'])) {
-        $pager->bindValue(1, "%${_GET['search']}%");
-        $pager->bindValue(2, "%${_GET['search']}%");
-        $pager->bindValue(3, "%${_GET['search']}%");
-        $pager->bindValue(4, "%${_GET['search']}%");
+        $pager->bindValue('search', "%${_GET['search']}%");
+    }
+    if ($mandate) {
+        $mandate = new Modele('mandate');
+        $mandate->find(['mandate_state' => 'ACTIVE'], 'mandate_start DESC');
+        if ($mandate->next()) {
+            $pager->bindValue('mandate', $mandate->getKey());
+        } else {
+            $pager->bindValue('mandate', 0);
+        }
     }
 
     $pager->run($tpl);
@@ -256,7 +283,7 @@ function user_view() {
         $sections[] = $line['section_id'];
         $tpl->append('sections', $line);
     }
-    
+
     //Last connection
     $lstConnect = $pdo->prepare('SELECT la_date, la_ip FROM logaudit WHERE la_user = ? AND la_type = "ACCEPT" ORDER BY la_date DESC LIMIT 1');
     $lstConnect->bindValue(1, $user['user_id']);
@@ -265,6 +292,19 @@ function user_view() {
     if ($audit) {
         $tpl->assign('audit', $audit);
     }
+
+    //Member paper form print
+    $mdt = new Modele('mandate');
+    if ($mdt->find('`mandate_start` < now() and `mandate_end` > now() and mandate_state = "ACTIVE"', 'mandate_ago DESC')) {
+        if ($mdt->next()) {
+            $mdt->assignTemplate('mandate');
+            $sub = new Modele('subscription');
+            $sub->find(array('subscription_mandate' => $mdt->getKey()));
+            $sub->appendTemplate('subs');
+        }
+    }
+    // <end> Member paper form print
+
 
     //List events
     $sql = $pdo->prepare('SELECT * FROM event_staff'
@@ -460,7 +500,11 @@ function user_check() {
 }
 
 function user_editpassword() {
-    global $tpl;
+    global $tpl, $config;
+
+    if ($config['cms']['saml']) {
+        throw new Exception('SAML is activated. Legacy system not available.');
+    }
 
     $pass = $_POST['password'];
     $confirm = $_POST['password2'];
@@ -574,4 +618,47 @@ function user_pdfex() {
     $pdf->out();
 
     quit();
+}
+
+function user_print() {
+    $acl = new Modele('logaudit');
+    $acl->addFrom([
+        'la_user' => $_GET['user'],
+        'la_date' => date('Y-m-d H:i:s'),
+        'la_type' => 'ACCEPT',
+        'la_ip' => '0.0.0.0',
+    ]);
+    modexec('index', 'print', $_GET['user'], $_POST['subscription']);
+}
+
+function user_edit() {
+    global $tpl;
+
+    $usr = new Modele('users');
+    $usr->fetch($_GET['user']);
+    $usr->assignTemplate('user');
+
+    $fieldset = [
+        'user_name',
+        'user_firstname',
+        'user_lastname',
+        'user_type',
+        'user_login',
+        'user_promo',
+        'user_email',
+        'user_phone',
+        'user_address',
+        'user_cp',
+        'user_town',
+        'user_sexe',
+        'user_born',
+        'user_role',
+    ];
+
+    if (isset($_POST['user_name'])) {
+        redirect('user', 'view', ['user' => $usr->getKey(), 'hsuccess' => $usr->modFrom($_POST, $fieldset) ? '1' : '0']);
+    }
+
+    $tpl->assign('fieldset', $fieldset);
+    display();
 }
