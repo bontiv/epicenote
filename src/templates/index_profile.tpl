@@ -47,6 +47,27 @@
   <div class="pill-pane{if $smarty.get.page == 'profile'} active{/if}" id="edit">
     <form method="POST" class="form-horizontal">
 
+      <legend>Vos informations</legend>
+
+      <div class="form-group">
+        <label class="col-md-4 control-label">Identifiant (pseudo)</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_name}</p></div>
+      </div>
+      <div class="form-group">
+        <label class="col-md-4 control-label">Nom</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_lastname}</p></div>
+      </div>
+      <div class="form-group">
+        <label class="col-md-4 control-label">Prénom</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_firstname}</p></div>
+      </div>
+      <div class="form-group">
+        <label class="col-md-4 control-label">Adresse email</label>
+        <div class="col-md-8"><p class="form-control-static">{$smarty.session.user.user_email}</p></div>
+      </div>
+
+      <div class="text-muted col-md-offset-4">Rendez-vous sur <a href="https://account.epitanime.com/">votre interface de compte Epitanime</a> pour modifier ces informations.</div>
+
       <legend>Edition du profil</legend>
 
       <fieldset>

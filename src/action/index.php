@@ -336,9 +336,6 @@ function index_profile() {
 
     $mdl = new Modele('users');
     $fieldset = [
-    'user_name',
-        'user_firstname',
-        'user_lastname',
         'user_sexe',
         'user_born',
         'user_type',
@@ -356,7 +353,7 @@ function index_profile() {
         if (strtolower(strrchr($_POST['user_email'], "@")) == "@epitanime.com") {
             $tpl->assign('error', "L'adresse email n'est pas valide.");
         } else {
-            $tpl->assign('hsuccess', $mdl->modFrom($_POST));
+            $tpl->assign('hsuccess', $mdl->modFrom($_POST, $fieldset));
             $mdl->user_hmail = md5(strtolower($mdl->user_email));
         }
     }
