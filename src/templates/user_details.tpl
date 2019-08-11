@@ -113,6 +113,17 @@
             <i class="glyphicon glyphicon-print"></i> Fiche membre
         </button>
 
+        {if $user.user_role != "ADMINISTRATOR" and $user.user_role != "SYSADMIN"}
+        <form method="POST" action="{mkurl action="admin" page="add"}">
+            <input type="hidden" value="{$user.user_name}" name="addadmin">
+            <button type="submit" class="btn btn-danger">
+                Mettre admin
+            </button>
+        </form>
+        {else}
+            <a href="{mkurl action="admin" page="remove" user=$user.user_id}" class="btn btn-default">Retirer droits admin</a>
+        {/if}
+
         {if not $saml}
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#passwordRecover">
             <i class="glyphicon glyphicon-edit"></i> Mot de passe
