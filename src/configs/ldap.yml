@@ -1,0 +1,31 @@
+name: ldap
+label: LDAP Syncronization
+fields:
+  ldap_uri:
+    type: var
+    label: LDAP server URI
+    default: "ldap://localhost:389/dc=epitanime,dc=com"
+
+  ldap_binddn:
+    type: var
+    label: Bind DN
+    default: cn=admin,dc=epitanime,dc=com
+
+  ldap_password:
+    type: var
+    label: Bind Password
+
+  ldap_userbase:
+    type: var
+    label: Base DN for Users
+    default: ou=Users,dc=epitanime,dc=com
+
+  ldap_groupbase:
+    type: var
+    label: Base DN for Groups
+    default: ou=Groups,dc=epitanime,dc=com
+
+  ldap_levelbase:
+    type: var
+    label: Base DN for Levels
+    default: ou=Levels,dc=epitanime,dc=com
