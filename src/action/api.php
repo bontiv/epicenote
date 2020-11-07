@@ -165,7 +165,7 @@ function api_authorize() {
     if (isset($url['user'])) {
         $uri .= urlencode($url['user']);
         if (isset($url['pass'])) {
-            $uri .= ':' . urlencode($pass);
+            $uri .= ':' . urlencode($url['pass']);
         }
         $uri .= '@';
     }
@@ -216,6 +216,16 @@ function api_token() {
     }
 
 
+
+
+    if ($_REQUEST['grant_type'] == 'authorization_code') {
+        return _api_token_authorize();
+    } elseif ($_REQUEST['grant_type'] == 'client_credentials') {
+        return _api_token_client();
+    }
+}
+
+function _api_token_client($cli) {
     //Recherche du client
     $cli = new Modele('api_clients');
     $cli->find(array(
@@ -227,14 +237,6 @@ function api_token() {
     }
 
 
-    if ($_REQUEST['grant_type'] == 'authorization_code') {
-        return _api_token_authorize($cli);
-    } elseif ($_REQUEST['grant_type'] == 'client_credentials') {
-        return _api_token_client($cli);
-    }
-}
-
-function _api_token_client($cli) {
     $token = array(
         'at_client' => $cli->getKey(),
         'at_type' => 'ACCESS',
@@ -281,25 +283,26 @@ function _api_token_client($cli) {
     quit();
 }
 
-function _api_token_authorize($cli) {
+function _api_token_authorize() {
+
+    //Recherche du token
+    $tok = new Modele('api_tokens');
+    $tok->find(array(
+        'at_code' => $_REQUEST['code'],
+        'at_type' => 'AUTH',
+    ));
+
+    if (!$tok->next()) {
+        return _api_error('invalid_grant', 'API token not found.');
+    }
+
     //Verif callback client
-    $allowed_callbaks = explode("\n", $cli->ac_callback);
+    $allowed_callbaks = explode("\n", $tok->at_client->ac_callback);
     foreach ($allowed_callbaks as &$callback) {
         $callback = trim($callback, " \t\n\r\0\x0B/");
     }
     if ($_REQUEST['redirect_uri'] == '' || !in_array($_REQUEST['redirect_uri'], $allowed_callbaks)) {
         return _api_error('invalid_request_uri', 'Callback not registred 1 :' . $_REQUEST['redirect_uri']); //Force l'arrêt
-    }
-
-    //Recherche du token
-    $tok = new Modele('api_tokens');
-    $tok->find(array(
-        'at_client' => $cli->getKey(),
-        'at_code' => $_REQUEST['code'],
-        'at_type' => 'AUTH',
-    ));
-    if (!$tok->next()) {
-        return _api_error('invalid_grant', 'API token not found.');
     }
 
     if ($tok->at_expire < time()) {
@@ -333,7 +336,7 @@ function _api_token_authorize($cli) {
     $claims = array(
         'iss' => $config['issuer'],
         'sub' => $update['at_code'],
-        'aud' => $cli->ac_client,
+        'aud' => $tok->at_client->ac_client,
         'exp' => $update['at_expire'],
         'iat' => $update['at_start'],
     );
